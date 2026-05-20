@@ -1,53 +1,67 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { SharedMaterialModule } from '../../../../shared/material/share-material.module';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { AuthService } from '../../services/auth.service';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
+import {
+  BriefcaseBusiness,
+  Eye,
+  EyeOff,
+  LucideAngularModule,
+} from 'lucide-angular';
 import { ApiResponse } from '../../../../shared/interfaces/api-response.interface';
 import { LoginResponse } from '../../interfaces/login-response.interface';
-import { SnackBarService } from '../../../../shared/services/snackbar.service';
+import { AuthService } from '../../services/auth.service';
+import { ToastrService } from 'ngx-toastr';
+
 @Component({
   selector: 'app-login',
-  imports: [CommonModule,
+  standalone: true,
+  imports: [
+    CommonModule,
     ReactiveFormsModule,
-    SharedMaterialModule],
+    RouterModule,
+    LucideAngularModule,
+  ],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
 export class Login {
+  Eye = Eye;
+  EyeOff = EyeOff;
+  BriefcaseBusiness = BriefcaseBusiness;
 
-  // ✅ Signals (modern Angular)
   hidePassword = signal(true);
+
   isLoading = signal(false);
+
+  submitted = false;
+
   private formBuilder = inject(FormBuilder);
+
   private destroyRef = inject(DestroyRef);
 
-  // ✅ Form (best practice: FormBuilder)
   loginForm = this.formBuilder.nonNullable.group({
-    email: ['', [Validators.required]],
-    password: ['', [Validators.required]]
-  });
+    email: ['', [Validators.required, Validators.email]],
 
+    password: ['', [Validators.required, Validators.minLength(6)]],
+  });
 
   constructor(
     private router: Router,
     private authService: AuthService,
-    private snackbar: SnackBarService
-  ) { }
+    private toastr: ToastrService,
+  ) {}
 
-
-
-  // 👁️ Toggle password
   togglePassword() {
-    this.hidePassword.update(v => !v);
+    this.hidePassword.update((v) => !v);
   }
-
-  // 🚀 Submit login
   onSubmit() {
+    this.submitted = true;
+
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
+
       return;
     }
 
@@ -55,38 +69,38 @@ export class Login {
 
     const payload = this.loginForm.getRawValue();
 
-    this.authService.login(payload)
+    this.authService
+      .login(payload)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response: ApiResponse<LoginResponse>) => {
-          console.log(response);
+          this.isLoading.set(false);
 
           if (response.success && response.result) {
-            this.isLoading.set(false);
-
             const accessToken = response.result.accessToken;
+
             const refreshToken = response.result.refreshToken;
 
             this.authService.setToken(accessToken, refreshToken);
 
-            this.snackbar.Success('Login successful');
-            this.router.navigate(['/']);
-          }
-          else {
-            this.snackbar.Error(
-              response.errorMessages?.join(",") ??
-              "An error occurred during login."
+            this.toastr.success('Login successful');
+
+            this.router.navigate(['/dashboard']);
+          } else {
+            this.toastr.error(
+              response.errorMessages?.join(',') ?? 'Login failed',
             );
           }
         },
+
         error: (error) => {
           this.isLoading.set(false);
-          this.snackbar.Error(error?.error?.message || 'Login failed');
-        }
+
+          this.toastr.error(error?.error?.message || 'Login failed');
+        },
       });
   }
 
-  // ✅ getters (clean HTML)
   get email() {
     return this.loginForm.controls.email;
   }

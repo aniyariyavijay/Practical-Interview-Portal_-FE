@@ -1,62 +1,115 @@
-<div class="login-container">
-    <mat-card class="login-card">
-  
-      <h2>Welcome Back</h2>
-      <p class="subtitle">Login to continue</p>
-  
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-  
-        <!-- Email -->
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Email</mat-label>
-          <input matInput formControlName="email" />
-          <mat-icon matSuffix>email</mat-icon>
-  
-          <mat-error *ngIf="loginForm.controls.email.hasError('required')">
+<div class="min-h-screen flex items-center justify-center bg-[#f5f6f8] p-4">
+  <div
+    class="w-full max-w-[430px] rounded-[18px] border border-[#e5e7eb] bg-white px-8 py-9 shadow-[0_10px_30px_rgba(0,0,0,0.06)]"
+  >
+    <!-- Logo -->
+
+    <div
+      class="mx-auto mb-5 flex h-[54px] w-[54px] items-center justify-center rounded-2xl bg-[#08132f]"
+    >
+      <lucide-icon [img]="BriefcaseBusiness" class="h-6 w-6 text-white">
+      </lucide-icon>
+    </div>
+
+    <!-- Heading -->
+
+    <h1 class="text-center text-[20px] font-bold text-[#0f172a]">
+      AI Interview System
+    </h1>
+
+    <p class="mt-2 mb-7 text-center text-sm text-[#64748b]">
+      Sign in to your portal account
+    </p>
+
+    <!-- Form -->
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4">
+      <!-- Email -->
+
+      <div>
+        <label class="mb-2 block text-sm font-semibold text-[#111827]">
+          Email
+        </label>
+
+        <input
+          type="email"
+          formControlName="email"
+          placeholder="alice@aips.io"
+          class="h-[52px] w-full rounded-[10px] border border-[#d1d5db] bg-white px-4 text-sm outline-none transition focus:border-[#08132f]"
+        />
+
+        <div
+          *ngIf="submitted && loginForm.controls.email.errors"
+          class="mt-1 text-xs text-red-500"
+        >
+          <span *ngIf="loginForm.controls.email.errors['required']">
             Email is required
-          </mat-error>
-          <mat-error *ngIf="loginForm.controls.email.hasError('email')">
+          </span>
+
+          <span *ngIf="loginForm.controls.email.errors['email']">
             Enter valid email
-          </mat-error>
-        </mat-form-field>
-  
-        <!-- Password -->
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Password</mat-label>
-  
-          <input matInput
-                 [type]="hidePassword() ? 'password' : 'text'"
-                 formControlName="password" />
-  
-          <button mat-icon-button matSuffix type="button"
-                  (click)="togglePassword()">
-            <mat-icon>
-              {{ hidePassword() ? 'visibility_off' : 'visibility' }}
-            </mat-icon>
-          </button>
-  
-          <mat-error *ngIf="loginForm.controls.password.hasError('required')">
-            Password is required
-          </mat-error>
-          <mat-error *ngIf="loginForm.controls.password.hasError('minlength')">
-            Minimum 6 characters
-          </mat-error>
-        </mat-form-field>
-  
-        <!-- Button -->
-        <button mat-raised-button color="primary"
-                class="full-width"
-                [disabled]="loginForm.invalid || isLoading()">
-  
-          {{ isLoading() ? 'Logging in...' : 'Login' }}
-        </button>
-  
-      </form>
-  
-      <div class="extra-links">
-        <a href="#">Forgot Password?</a>
-        <a href="#">Sign Up</a>
+          </span>
+        </div>
       </div>
-  
-    </mat-card>
+
+      <!-- Password -->
+
+      <div>
+        <label class="mb-2 block text-sm font-semibold text-[#111827]">
+          Password
+        </label>
+
+        <div class="relative">
+          <input
+            [type]="hidePassword() ? 'password' : 'text'"
+            formControlName="password"
+            placeholder="Enter password"
+            class="h-[52px] w-full rounded-[10px] border border-[#d1d5db] bg-white px-4 pr-12 text-sm outline-none transition focus:border-[#08132f]"
+          />
+
+          <button
+            type="button"
+            (click)="togglePassword()"
+            class="absolute top-1/2 right-4 -translate-y-1/2 text-[#64748b]"
+          >
+            <lucide-icon *ngIf="hidePassword()" [img]="EyeOff" class="h-5 w-5">
+            </lucide-icon>
+
+            <lucide-icon *ngIf="!hidePassword()" [img]="Eye" class="h-5 w-5">
+            </lucide-icon>
+          </button>
+        </div>
+
+        <div
+          *ngIf="submitted && loginForm.controls.password.errors"
+          class="mt-1 text-xs text-red-500"
+        >
+          <span *ngIf="loginForm.controls.password.errors['required']">
+            Password is required
+          </span>
+
+          <span *ngIf="loginForm.controls.password.errors['minlength']">
+            Minimum 6 characters
+          </span>
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        [disabled]="loginForm.invalid || isLoading()"
+        class="mt-2 h-[48px] w-full rounded-[10px] bg-[#08132f] text-sm font-semibold text-white transition hover:bg-[#0d1b45] disabled:cursor-not-allowed disabled:opacity-70"
+      >
+        Login
+      </button>
+    </form>
+
+    <div class="mt-6 flex items-center justify-center gap-3 text-sm">
+      <a
+        routerLink="/auth/forgot-password"
+        class="font-medium text-[#64748b] transition hover:text-[#08132f]"
+      >
+        Forgot Password?
+      </a>
+    </div>
   </div>
+</div>

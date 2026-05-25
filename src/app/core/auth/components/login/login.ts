@@ -51,7 +51,7 @@ export class Login {
     private router: Router,
     private authService: AuthService,
     private toastr: ToastrService,
-  ) {}
+  ) { }
 
   togglePassword() {
     this.hidePassword.update((v) => !v);
@@ -81,7 +81,12 @@ export class Login {
 
             const refreshToken = response.result.refreshToken;
 
-            this.authService.setToken(accessToken, refreshToken);
+            const user = {
+              userName: response.result.user?.username,
+              email: response.result.user?.email,
+            };
+
+            this.authService.setToken(accessToken, refreshToken, user);
 
             this.toastr.success('Login successful');
 

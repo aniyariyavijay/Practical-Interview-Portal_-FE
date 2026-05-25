@@ -6,7 +6,7 @@ export const coreRoutes: Routes = [
   {
     path: '',
     component: Layout,
-    // canActivate: [AuthGuard()],
+    canActivate: [AuthGuard()],
     children: [
       {
         path: 'dashboard',

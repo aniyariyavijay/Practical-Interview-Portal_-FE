@@ -24,6 +24,7 @@ import {
 } from 'lucide-angular';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
+import { AuthService } from '../auth/services/auth.service';
 
 @Component({
   selector: 'app-layout',
@@ -44,11 +45,16 @@ export class Layout {
   collapsed = signal(false);
   ChevronDown = ChevronDown;
 
+  userName = '';
+  email = '';
+
   UserCircle2 = UserCircle2;
   Menu = Menu;
   LogOut = LogOut;
   Bot = Bot;
-  constructor(private router: Router) {}
+
+  constructor(private authService: AuthService, private router: Router) { }
+
   navItems = [
     {
       label: 'Dashboard',
@@ -97,8 +103,19 @@ export class Layout {
     this.collapsed.update((v) => !v);
   }
 
-  onSignOut() {
-    localStorage.clear();
+  ngOnInit(): void {
+    const user = this.authService.getUser();
+
+    if (user) {
+      this.userName = user.userName;
+
+      this.email = user.email;
+    }
+  }
+
+  onSignOut(): void {
+    this.authService.logout();
+
     this.router.navigate(['/auth/login']);
   }
 }

@@ -32,20 +32,33 @@ export class ResetPassword {
     private router: Router,
     private authService: AuthService,
     private toastr: ToastrService,
-  ) {}
+  ) { }
 
-  // ngOnInit() {
-  //   this.token = this.route.snapshot.paramMap.get('token') || '';
+ ngOnInit() {
+  this.token = this.route.snapshot.paramMap.get('token') || '';
 
-  //   this.authService.validateResetToken(this.token).subscribe({
-  //     error: () => {
-  //       this.toastr.error('Invalid or expired reset link');
+  console.log('TOKEN:', this.token);
 
-  //       this.router.navigate(['/auth/login']);
-  //     },
-  //   });
-  // }
+  this.authService.validateResetToken(this.token).subscribe({
+    next: (response: any) => {
+      console.log('VALIDATE RESPONSE:', response);
 
+      if (!response.success) {
+        this.toastr.error('Invalid or expired reset link');
+
+        this.router.navigate(['/auth/login']);
+      }
+    },
+
+    error: (error) => {
+      console.log('VALIDATE ERROR:', error);
+
+      this.toastr.error('Invalid or expired reset link');
+
+      this.router.navigate(['/auth/login']);
+    },
+  });
+}
   onSubmit() {
     if (this.resetForm.invalid) {
       this.resetForm.markAllAsTouched();

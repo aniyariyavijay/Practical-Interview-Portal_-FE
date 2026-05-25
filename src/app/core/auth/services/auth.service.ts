@@ -10,6 +10,7 @@ import { Router } from '@angular/router';
 import { TokenClaims } from '../interfaces/token-claims.interface';
 import { RegisterRequest } from '../interfaces/register-request.interface';
 import { ResetPasswordRequest } from '../interfaces/reset-password-request.interface';
+import { ForgotRequest } from '../interfaces/forgot-request.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -18,7 +19,7 @@ export class AuthService {
   constructor(
     private apiInterface: APIInterfaceService,
     private router: Router,
-  ) {}
+  ) { }
 
   login(formDetails: LoginRequest): Observable<ApiResponse<LoginResponse>> {
     return this.apiInterface.post<LoginResponse>(
@@ -31,7 +32,7 @@ export class AuthService {
     return this.apiInterface.post(API_ROUTES.AUTH.REGISTER, formDetails);
   }
 
-  forgotPassword(formDetails: string) {
+  forgotPassword(formDetails: ForgotRequest) {
     return this.apiInterface.post(API_ROUTES.AUTH.FORGOT_PASSWORD, formDetails);
   }
 
@@ -80,14 +81,31 @@ export class AuthService {
     };
   }
 
-  setToken(accessToken: string, refreshToken: string): void {
+  setToken(
+    accessToken: string,
+    refreshToken: string,
+    user?: any,
+  ) {
     localStorage.setItem('accessToken', accessToken);
+
     localStorage.setItem('refreshToken', refreshToken);
+
+    if (user) {
+      localStorage.setItem('user', JSON.stringify(user));
+    }
+  }
+
+  getUser() {
+    const user = localStorage.getItem('user');
+
+    return user ? JSON.parse(user) : null;
   }
 
   logout() {
-    if (!this.isTokenExists()) {
-      this.taskAfterLogout();
-    }
+    localStorage.removeItem('accessToken');
+
+    localStorage.removeItem('refreshToken');
+
+    localStorage.removeItem('user');
   }
 }

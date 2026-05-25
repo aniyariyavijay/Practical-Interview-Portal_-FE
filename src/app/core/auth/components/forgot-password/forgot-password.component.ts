@@ -2,9 +2,9 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../services/auth.service';
 import { ArrowLeft, LucideAngularModule } from 'lucide-angular';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-forgot-password',
@@ -28,10 +28,12 @@ export class ForgotPassword {
   forgotForm = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
   });
+
   constructor(
     private authService: AuthService,
     private toastr: ToastrService,
-  ) {}
+  ) { }
+
   onSubmit() {
     this.submitted = true;
 
@@ -43,7 +45,7 @@ export class ForgotPassword {
 
     this.isLoading.set(true);
 
-    const payload = this.forgotForm.getRawValue().email;
+    const payload = this.forgotForm.getRawValue();
 
     this.authService.forgotPassword(payload).subscribe({
       next: (response: any) => {

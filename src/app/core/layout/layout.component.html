@@ -57,12 +57,12 @@
           <lucide-angular [img]="UserCircle2" size="26"></lucide-angular>
         </div>
 
-        <span class="profile-name">Alice Carter</span>
+        <span class="profile-name">{{ userName }}</span>
       </button>
 
       <mat-menu #profileMenu="matMenu" xPosition="before">
         <div class="menu-email" (click)="$event.stopPropagation()">
-          alice&#64;aips.io
+          {{ email }}
         </div>
 
         <button mat-menu-item (click)="onSignOut()">

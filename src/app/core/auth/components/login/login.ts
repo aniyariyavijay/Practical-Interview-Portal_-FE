@@ -84,6 +84,9 @@ export class Login {
             const user = {
               userName: response.result.user?.username,
               email: response.result.user?.email,
+              isActive: response.result.user?.isActive,
+              roleId: response.result.user?.role?.id,
+              roleName: response.result.user?.role?.roleName,
             };
 
             this.authService.setToken(accessToken, refreshToken, user);
@@ -100,8 +103,7 @@ export class Login {
 
         error: (error) => {
           this.isLoading.set(false);
-
-          this.toastr.error(error?.error?.message || 'Login failed');
+          this.toastr.error(error?.error?.errorMessages[0] || 'Login failed');
         },
       });
   }

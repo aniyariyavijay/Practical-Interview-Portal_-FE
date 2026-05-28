@@ -47,6 +47,7 @@ export class Layout {
 
   userName = '';
   email = '';
+  role = 'ADMIN';
 
   UserCircle2 = UserCircle2;
   Menu = Menu;
@@ -105,11 +106,10 @@ export class Layout {
 
   ngOnInit(): void {
     const user = this.authService.getUser();
-
     if (user) {
       this.userName = user.userName;
-
       this.email = user.email;
+      this.role = user.roleName;
     }
   }
 

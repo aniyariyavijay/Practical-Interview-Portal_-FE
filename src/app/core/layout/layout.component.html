@@ -10,7 +10,7 @@
       </div>
 
       @if (!collapsed()) {
-        <h2>AIPS Portal</h2>
+      <h2>AIPS Portal</h2>
       }
     </div>
 
@@ -18,15 +18,15 @@
 
     <nav>
       @for (item of navItems; track item.route) {
-        <a [routerLink]="item.route" routerLinkActive="active">
-          <lucide-angular [img]="item.icon" size="20"></lucide-angular>
+      <a [routerLink]="item.route" routerLinkActive="active">
+        <lucide-angular [img]="item.icon" size="20"></lucide-angular>
 
-          @if (!collapsed()) {
-            <span>
-              {{ item.label }}
-            </span>
-          }
-        </a>
+        @if (!collapsed()) {
+        <span>
+          {{ item.label }}
+        </span>
+        }
+      </a>
       }
     </nav>
 
@@ -36,7 +36,7 @@
       <lucide-angular [img]="Menu" size="18"></lucide-angular>
 
       @if (!collapsed()) {
-        <span> Collapse </span>
+      <span> Collapse </span>
       }
     </button>
   </aside>
@@ -48,16 +48,12 @@
 
     <header class="header">
       <!-- plain button — no mat-button directive, full layout control -->
-      <button
-        class="profile-btn"
-        [matMenuTriggerFor]="profileMenu"
-        type="button"
-      >
+      <button class="profile-btn" [matMenuTriggerFor]="profileMenu" type="button">
         <div class="profile-avatar">
           <lucide-angular [img]="UserCircle2" size="26"></lucide-angular>
         </div>
 
-        <span class="profile-name">{{ userName }}</span>
+        <span class="profile-name">{{ userName | titlecase }} {{ "(" + ( role | titlecase ) + ")"}}</span>
       </button>
 
       <mat-menu #profileMenu="matMenu" xPosition="before">
@@ -66,11 +62,7 @@
         </div>
 
         <button mat-menu-item (click)="onSignOut()">
-          <lucide-angular
-            [img]="LogOut"
-            size="16"
-            class="menu-icon"
-          ></lucide-angular>
+          <lucide-angular [img]="LogOut" size="16" class="menu-icon"></lucide-angular>
           <span>Sign out</span>
         </button>
       </mat-menu>

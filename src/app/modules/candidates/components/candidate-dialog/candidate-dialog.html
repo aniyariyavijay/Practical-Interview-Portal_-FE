@@ -1,0 +1,141 @@
+<div class="dialog-container">
+
+    <!-- HEADER -->
+    <div class="dialog-header">
+
+        <div>
+            <h2>
+                {{ isEditMode ? 'Edit Candidate' : 'Add Candidate' }}
+            </h2>
+
+            <p>
+                Manage candidate details
+            </p>
+        </div>
+
+    </div>
+
+    <!-- FORM -->
+    <form [formGroup]="form" class="dialog-form">
+
+        <!-- FIRST NAME -->
+        <div class="form-group">
+
+            <label>
+                First Name
+            </label>
+
+            <input
+                type="text"
+                formControlName="firstName"
+                placeholder="Enter first name"
+            />
+
+        </div>
+
+        <!-- LAST NAME -->
+        <div class="form-group">
+
+            <label>
+                Last Name
+            </label>
+
+            <input
+                type="text"
+                formControlName="lastName"
+                placeholder="Enter last name"
+            />
+
+        </div>
+
+        <!-- EMAIL -->
+        <div class="form-group">
+
+            <label>
+                Email
+            </label>
+
+            <input
+                type="email"
+                formControlName="email"
+                placeholder="Enter email"
+            />
+
+        </div>
+
+        <div class="row">
+
+            <!-- EXPERIENCE -->
+            <div class="form-group flex-1">
+
+                <label>
+                    Experience
+                </label>
+
+                <input
+                    type="number"
+                    formControlName="experience"
+                    placeholder="Years"
+                />
+
+            </div>
+
+            <!-- DESIGNATION -->
+            <div class="form-group flex-1">
+
+                <label>
+                    Designation
+                </label>
+
+                <input
+                    type="text"
+                    formControlName="designation"
+                    placeholder="Enter designation"
+                />
+
+            </div>
+
+        </div>
+
+        <!-- STATUS -->
+        <div class="status-section">
+
+            <label>
+                Status
+            </label>
+
+            <label class="switch">
+
+                <input
+                    type="checkbox"
+                    formControlName="isActive"
+                />
+
+                <span class="slider"></span>
+
+            </label>
+
+        </div>
+
+    </form>
+
+    <!-- ACTIONS -->
+    <div class="dialog-actions">
+
+        <button
+            class="cancel-btn"
+            mat-dialog-close
+        >
+            Cancel
+        </button>
+
+        <button
+            class="submit-btn"
+            (click)="submit()"
+        >
+            {{ isEditMode ? 'Update Candidate' : 'Create Candidate' }}
+        </button>
+
+    </div>
+
+</div>

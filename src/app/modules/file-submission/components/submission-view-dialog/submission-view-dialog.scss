@@ -1,0 +1,90 @@
+.dialog-container {
+  padding: 24px;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.dialog-header {
+  margin-bottom: 24px;
+
+  h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  p {
+    margin-top: 6px;
+    color: #64748b;
+  }
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+
+  label {
+    font-size: 13px;
+    color: #64748b;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  span {
+    font-size: 15px;
+    color: #0f172a;
+  }
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.status {
+  color: #15803d;
+  font-weight: 600;
+}
+
+.score {
+  color: #2563eb;
+  font-weight: 700;
+}
+
+.feedback-box {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 14px;
+  line-height: 1.6;
+}
+
+.code-box {
+  background: #0f172a;
+  color: #f8fafc;
+  padding: 16px;
+  border-radius: 12px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.close-btn {
+  border: none;
+  padding: 10px 24px;
+  border-radius: 10px;
+  background: #0f172a;
+  color: white;
+  cursor: pointer;
+}

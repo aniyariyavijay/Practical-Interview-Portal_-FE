@@ -59,7 +59,7 @@ export const coreRoutes: Routes = [
         path: 'submissions',
         loadComponent: () =>
           import('../modules/file-submission/components/file-submission/file-submission.component').then(
-            (m) => m.FileSubmissionComponent,
+            (m) => m.FileSubmissionsComponent,
           ),
       },
 

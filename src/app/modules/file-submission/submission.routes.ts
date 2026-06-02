@@ -5,7 +5,7 @@ export const submissionRoutes: Routes = [
     path: 'file-submission',
     loadComponent: () =>
       import('./components/file-submission/file-submission.component').then(
-        (m) => m.FileSubmissionComponent,
+        (m) => m.FileSubmissionsComponent,
       ),
   },
 ];

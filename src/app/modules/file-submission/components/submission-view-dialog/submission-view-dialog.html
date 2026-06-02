@@ -1,0 +1,81 @@
+<div class="dialog-container">
+
+    <!-- HEADER -->
+    <div class="dialog-header">
+
+        <div>
+            <h2>
+                Submission Details
+            </h2>
+
+            <p>
+                Candidate submission and AI evaluation
+            </p>
+        </div>
+
+    </div>
+
+    <!-- DETAILS -->
+
+    <div class="details-grid">
+
+        <div class="detail-item">
+            <label>Assessment</label>
+            <span>{{ data.assessmentName }}</span>
+        </div>
+
+        <div class="detail-item">
+            <label>Candidate</label>
+            <span>{{ data.candidateName }}</span>
+        </div>
+
+        <div class="detail-item">
+            <label>Status</label>
+            <span class="status">
+                {{ data.output }}
+            </span>
+        </div>
+
+        <div class="detail-item">
+            <label>AI Score</label>
+            <span class="score">
+                {{ data.aiScore }}/10
+            </span>
+        </div>
+
+        <div class="detail-item full-width">
+            <label>AI Feedback</label>
+
+            <div class="feedback-box">
+                {{ data.aiFeedback }}
+            </div>
+        </div>
+
+        <div class="detail-item full-width">
+            <label>Submitted Code</label>
+
+            <pre class="code-box">
+{{ data.code }}
+            </pre>
+        </div>
+
+        <div class="detail-item">
+            <label>Evaluated On</label>
+            <span>
+                {{ data.evaluatedAt | date:'medium' }}
+            </span>
+        </div>
+
+    </div>
+
+    <div class="dialog-actions">
+
+        <button
+            mat-dialog-close
+            class="close-btn">
+            Close
+        </button>
+
+    </div>
+
+</div>

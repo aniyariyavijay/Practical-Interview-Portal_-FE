@@ -52,27 +52,52 @@
         </div>
 
         <div class="detail-item full-width">
-            <label>Submitted Code</label>
 
-            <pre class="code-box">
-{{ data.code }}
-            </pre>
-        </div>
+            <label>
+                Candidate Solutions
+            </label>
 
-        <div class="detail-item">
-            <label>Evaluated On</label>
-            <span>
-                {{ data.evaluatedAt | date:'medium' }}
-            </span>
+            <div class="solution-list">
+
+                @for(solution of solutions; track solution.id) {
+
+                <button class="solution-card" (click)="viewSolution(solution)">
+
+                    <div class="solution-icon">
+                        <mat-icon>
+                            description
+                        </mat-icon>
+                    </div>
+
+                    <div class="solution-content">
+
+                        <div class="solution-title">
+                            {{ solution.questionTitle }}
+                        </div>
+
+                        <div class="solution-meta">
+                            Score: {{ solution.aiScore }}/10
+                        </div>
+
+                    </div>
+
+                    <mat-icon class="arrow">
+                        arrow_forward_ios
+                    </mat-icon>
+
+                </button>
+
+                }
+
+            </div>
+
         </div>
 
     </div>
 
     <div class="dialog-actions">
 
-        <button
-            mat-dialog-close
-            class="close-btn">
+        <button mat-dialog-close class="close-btn">
             Close
         </button>
 

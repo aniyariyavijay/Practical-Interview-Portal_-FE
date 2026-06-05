@@ -37,11 +37,9 @@ export class ResetPassword {
  ngOnInit() {
   this.token = this.route.snapshot.paramMap.get('token') || '';
 
-  console.log('TOKEN:', this.token);
 
   this.authService.validateResetToken(this.token).subscribe({
     next: (response: any) => {
-      console.log('VALIDATE RESPONSE:', response);
 
       if (!response.success) {
         this.toastr.error('Invalid or expired reset link');
@@ -51,7 +49,6 @@ export class ResetPassword {
     },
 
     error: (error) => {
-      console.log('VALIDATE ERROR:', error);
 
       this.toastr.error('Invalid or expired reset link');
 

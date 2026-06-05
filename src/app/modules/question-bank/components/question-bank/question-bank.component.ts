@@ -149,7 +149,7 @@ export class QuestionBankComponent {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '420px',
       disableClose: true,
-      data: { name: question.title },
+      data: { title:"Question",name: question.title },
     });
 
     dialogRef.afterClosed().subscribe((confirmed) => {

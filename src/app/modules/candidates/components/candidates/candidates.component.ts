@@ -141,6 +141,7 @@ export class CandidatesComponent implements OnInit {
         width: '420px',
         disableClose: true,
         data: {
+          title:"Candidate",
           name:
             candidate.firstName +
             ' ' +

@@ -3,46 +3,49 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiResponse } from '../../../shared/interfaces/api-response.interface';
 import { Category, Question } from '../interfaces/question.interfase';
+import { APIInterfaceService } from '../../../shared/services/api-interface.service';
+import { API_ROUTES } from '../../../shared/common/api-routes';
 
 @Injectable({
   providedIn: 'root',
 })
 export class QuestionService {
-  private readonly apiUrl = 'http://localhost:8080/questions';
 
-  constructor(private readonly http: HttpClient) { }
+  constructor(
+    private apiInterface: APIInterfaceService,
+    private readonly http: HttpClient) { }
 
-  getQuestions() : Observable<ApiResponse<Question[]>> {
-    return this.http.get<ApiResponse<Question[]>>(this.apiUrl);
+  getQuestions(): Observable<ApiResponse<Question[]>> {    
+    return this.apiInterface.get<Question[]>(API_ROUTES.QUESTIONS.GET_ALL);
   }
 
-  getQuestionbyId(id : number) :  Observable<ApiResponse<Question>>  {
-    return this.http.get<ApiResponse<Question>>(`${this.apiUrl}/${id}`);
+  getQuestionbyId(id: number): Observable<ApiResponse<Question>> {
+    return this.apiInterface.get<Question>(`${API_ROUTES.QUESTIONS.GET_BY_ID}${id}`);
   }
 
-  createQuestion(payload: any) :  Observable<ApiResponse<string>> {
-    return this.http.post<ApiResponse<string>>(
-      this.apiUrl,
+  createQuestion(payload: any): Observable<ApiResponse<string>> {
+    return this.apiInterface.post<string>(
+      API_ROUTES.QUESTIONS.CREATE,
       payload
     );
   }
 
-  updateQuestion (
+  updateQuestion(
     id: number,
     payload: any
-  )  :  Observable<ApiResponse<string>>  {
-    return this.http.put<ApiResponse<string>>(
-      `${this.apiUrl}/${id}`,
+  ): Observable<ApiResponse<string>> {
+    return this.apiInterface.put<string>(
+      `${API_ROUTES.QUESTIONS.UPDATE}${id}`,
       payload
     );
   }
 
-  deleteQuestion(id: number):  Observable<ApiResponse<string>>  {
-    return this.http.delete<ApiResponse<string>>(`${this.apiUrl}/${id}`);
+  deleteQuestion(id: number): Observable<ApiResponse<string>> {
+    return this.apiInterface.delete<string>(`${API_ROUTES.QUESTIONS.DELETE}${id}`);
   }
 
-  getCategories():  Observable<ApiResponse<Category[]>>  {
-    return this.http.get<ApiResponse<Category[]>>(`${this.apiUrl}/category`);
+  getCategories(): Observable<ApiResponse<Category[]>> {
+    return this.apiInterface.get<Category[]>(API_ROUTES.QUESTIONS.GET_ALL_CATEGORIES);
   }
 
 }

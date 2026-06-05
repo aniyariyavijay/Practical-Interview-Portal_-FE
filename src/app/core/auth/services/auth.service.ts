@@ -11,6 +11,7 @@ import { TokenClaims } from '../interfaces/token-claims.interface';
 import { RegisterRequest } from '../interfaces/register-request.interface';
 import { ResetPasswordRequest } from '../interfaces/reset-password-request.interface';
 import { ForgotRequest } from '../interfaces/forgot-request.interface';
+import { HttpParams } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
@@ -25,6 +26,18 @@ export class AuthService {
     return this.apiInterface.post<LoginResponse>(
       API_ROUTES.AUTH.LOGIN,
       formDetails,
+    );
+  }
+
+  getRefreshToken(): Observable<ApiResponse<Record<string, string>>> {
+    const refreshToken: string = localStorage.getItem('refreshToken') || '';
+
+    const params = new HttpParams().set('refreshToken', refreshToken);
+
+    return this.apiInterface.post<Record<string, string>>(
+      API_ROUTES.AUTH.REFRESH,
+      null,
+      params
     );
   }
 
@@ -66,6 +79,7 @@ export class AuthService {
   getToken(): string {
     return localStorage.getItem('accessToken') ?? '';
   }
+
 
   getClaims(): TokenClaims {
     const jwtHelper = new JwtHelperService();

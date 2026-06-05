@@ -175,9 +175,7 @@ export class QuestionBankFormComponent {
     this.submitted = true;
     this.questionForm.markAllAsTouched();
 
-    if (this.questionForm.invalid) {
-      console.log(this.questionForm.value);
-      
+    if (this.questionForm.invalid) {      
       return;
     }
 
@@ -230,6 +228,70 @@ export class QuestionBankFormComponent {
     );
   }
 
+  triggerFileInput(index: number): void {
+    const fileInput = document.getElementById(`file-upload-${index}`) as HTMLInputElement;
+    if (fileInput) {
+      fileInput.click();
+    }
+  }
+
+  onFileUpload(event: Event, index: number): void {
+    const input = event.target as HTMLInputElement;
+    
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      const reader = new FileReader();
+
+      // What to do when the file is finished loading
+      reader.onload = (e: any) => {
+        const fileContent = e.target.result;
+
+        // Find the specific form group in the array
+        const solutionGroup = this.solutions.at(index);
+        
+        // Patch the text area with the file contents!
+        solutionGroup.patchValue({
+          solutionCode: fileContent
+        });
+
+        // 🔥 BONUS: Auto-detect the language based on file extension!
+        this.autoDetectLanguage(file.name, solutionGroup, index);
+      };
+
+      // Read the file as raw text
+      reader.readAsText(file);
+      
+      // Clear the input so the user can upload the same file again if they want
+      input.value = ''; 
+    }
+  }
+
+  private autoDetectLanguage(filename: string, group: any, index: number): void {
+    const ext = filename.split('.').pop()?.toLowerCase();
+    let detectedLang = '';
+
+    if (ext === 'java') detectedLang = 'Java';
+    else if (ext === 'py') detectedLang = 'Python';
+    else if (ext === 'js') detectedLang = 'JavaScript';
+    else if (ext === 'cpp' || ext === 'cc' || ext === 'c') detectedLang = 'C++';
+    else if (ext === 'go') detectedLang = 'Go';
+
+    // Only set it if we found a match AND that language isn't already used elsewhere
+    if (detectedLang && !this.isLanguageDisabled(detectedLang, index)) {
+      group.patchValue({ language: detectedLang });
+    }
+  }
+
+  onLanguageChange(index: number): void {
+    // 1. Grab the specific form group from the array using the index
+    const solutionGroup = this.solutions.at(index);
+    
+    // 2. Patch the code value to an empty string!
+    solutionGroup.patchValue({
+      solutionCode: ''
+    });
+  }
+  
   goBack(): void {
     this.router.navigate(['/question-bank']);
   }

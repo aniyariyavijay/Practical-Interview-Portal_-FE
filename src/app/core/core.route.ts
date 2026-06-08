@@ -26,9 +26,9 @@ export const coreRoutes: Routes = [
 
       {
         path: 'question-bank',
-        loadComponent: () =>
-          import('../modules/question-bank/components/question-bank/question-bank.component').then(
-            (m) => m.QuestionBankComponent,
+        loadChildren: () =>
+          import('../modules/question-bank/question-bank.route').then(
+            (m) => m.questionBankRoutes,
           ),
       },
 

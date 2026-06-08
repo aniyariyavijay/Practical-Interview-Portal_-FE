@@ -137,6 +137,7 @@ export class UsersComponent implements OnInit {
         width: '420px',
         disableClose: true,
         data: {
+          title:"User",
           name: user.username,
         },
       }

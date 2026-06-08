@@ -14,7 +14,7 @@ import {
 export class EvalutionService {
   private readonly http = inject(HttpClient);
   private readonly base = 'http://localhost:8080/api/mock-interview';
-
+  private readonly baseUrl = 'http://localhost:8080';
   /** Single question */
   submitSingle(
     solutionFile: File,
@@ -46,6 +46,25 @@ export class EvalutionService {
     return this.http
       .post<MultiQuestionEvaluationResult>(`${this.base}/evaluate-multi`, fd)
       .pipe(catchError(this.handleError));
+  }
+
+  getCandidates(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/candidates`);
+  }
+
+  getCandidateEvaluation(candidateId: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/candidates/candidate/${candidateId}`);
+  }
+
+  evaluateAssessment(formData: FormData): Observable<any> {
+    return this.http.post(
+      `${this.baseUrl}/api/mock-interview/evaluate-multi`,
+      formData,
+    );
+  }
+
+  getReferenceSolution(solutionId: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/reference-solutions/${solutionId}`);
   }
 
   private handleError(error: HttpErrorResponse): Observable<never> {

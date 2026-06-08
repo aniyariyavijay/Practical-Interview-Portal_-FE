@@ -6,9 +6,11 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import {
   AssessmentListItem,
+  CandidateListItem,
   QuestionItem,
   SubmissionState,
 } from '../../interfaces/evaluation.mode';
+import { EvalutionService } from '../../services/evalution.service';
 
 @Component({
   selector: 'app-file-submission',
@@ -18,13 +20,14 @@ import {
   styleUrl: './evaluations.component.scss',
 })
 export class EvaluationsComponent implements OnInit {
-  private readonly http = inject(HttpClient);
+  private readonly evaluationService = inject(EvalutionService);
 
-  assessments: AssessmentListItem[] = [];
+  candidates: CandidateListItem[] = [];
 
   selectedAssessmentId: number | null = null;
+  selectedCandidateId: number | null = null;
 
-  candidateName = '';
+  assessmentTitle = '';
 
   qs: QuestionItem[] = [];
 
@@ -40,158 +43,65 @@ export class EvaluationsComponent implements OnInit {
   draggingSubmission = signal<Record<number, boolean>>({});
 
   ngOnInit(): void {
-    this.loadAssessments();
+    this.loadCandidates();
   }
 
-  loadAssessments() {
-    // API CALL
+  loadCandidates() {
+    this.evaluationService.getCandidates().subscribe({
+      next: (res) => {
+        this.candidates = res.result.map((x: any) => ({
+          id: x.id,
 
-    // this.http
-    //   .get<AssessmentListItem[]>(
-    //     'http://localhost:8080/api/assessments/submission-list'
-    //   )
-    //   .subscribe({
-    //     next: (res) => {
-    //       this.assessments = res;
-    //     },
-    //   });
-
-    // DUMMY DATA
-
-    this.assessments = [
-      {
-        id: 1,
-        title: 'Java Backend Round',
-        candidateName: 'Rahul Sharma',
+          candidateName: x.firstName + ' ' + x.lastName,
+        }));
       },
-
-      {
-        id: 2,
-        title: 'Spring Boot Assessment',
-        candidateName: 'Anjali Patel',
-      },
-
-      {
-        id: 3,
-        title: 'DSA Technical Round',
-        candidateName: 'Vivek Mehta',
-      },
-    ];
+    });
   }
 
-  onAssessmentChange(id: number) {
-    this.selectedAssessmentId = id;
+  onCandidateChange(candidateId: number) {
+    this.selectedCandidateId = candidateId;
+    this.qs = [];
+    this.evaluationService.getCandidateEvaluation(candidateId).subscribe({
+      next: (res) => {
+        this.selectedAssessmentId = res.assessmentId;
+        this.assessmentTitle = res.assessmentTitle;
 
-    // API CALL
+        if (res.isEvaluated) {
+          this.submissionState.update((s) => ({
+            ...s,
+            isSuccess: true,
+            result: res.evaluation,
+          }));
 
-    // this.http
-    //   .get<any>(
-    //     `http://localhost:8080/api/assessments/${id}/submission-data`
-    //   )
-    //   .subscribe({
-    //     next: (res) => {
-    //
-    //       this.candidateName = res.candidate.name;
-    //
-    //       this.qs = res.questions.map((q: any) => ({
-    //         questionId: q.id,
-    //         title: q.title,
-    //         solutionFile: null,
-    //         submissionFile: null,
-    //       }));
-    //     },
-    //   });
-
-    // DUMMY DATA
-
-    if (id === 1) {
-      this.candidateName = 'Rahul Sharma';
-
-      this.qs = [
-        {
-          questionId: 1,
-          questionTopic: 'Implement Singleton Design Pattern in Java',
+          return;
+        }
+        this.submissionState.update((s) => ({
+          ...s,
+          isSuccess: false,
+          result: null,
+        }));
+        this.qs = res.questions.map((q: any) => ({
+          questionId: q.questionId,
+          questionTopic: q.questionTitle,
+          solutionFileId: q.solutionFileId,
+          solutionFileName: q.solutionFileName,
           solutionFile: null,
           submissionFile: null,
-        },
-
-        {
-          questionId: 2,
-          questionTopic: 'Find Duplicate Elements using Java Streams',
-          solutionFile: null,
-          submissionFile: null,
-        },
-
-        {
-          questionId: 3,
-          questionTopic: 'Create REST API using Spring Boot',
-          solutionFile: null,
-          submissionFile: null,
-        },
-      ];
-    } else if (id === 2) {
-      this.candidateName = 'Anjali Patel';
-
-      this.qs = [
-        {
-          questionId: 4,
-          questionTopic: 'Implement JWT Authentication in Spring Boot',
-          solutionFile: null,
-          submissionFile: null,
-        },
-
-        {
-          questionId: 5,
-          questionTopic: 'Create Global Exception Handler',
-          solutionFile: null,
-          submissionFile: null,
-        },
-
-        {
-          questionId: 6,
-          questionTopic: 'Implement Pagination and Sorting API',
-          solutionFile: null,
-          submissionFile: null,
-        },
-      ];
-    } else if (id === 3) {
-      this.candidateName = 'Vivek Mehta';
-
-      this.qs = [
-        {
-          questionId: 7,
-          questionTopic: 'Binary Search using Java',
-          solutionFile: null,
-          submissionFile: null,
-        },
-
-        {
-          questionId: 8,
-          questionTopic: 'Reverse Linked List',
-          solutionFile: null,
-          submissionFile: null,
-        },
-
-        {
-          questionId: 9,
-          questionTopic: 'Find Longest Substring Without Repeating Characters',
-          solutionFile: null,
-          submissionFile: null,
-        },
-      ];
-    }
+        }));
+      },
+    });
   }
 
   canSubmit(): boolean {
     return (
       this.selectedAssessmentId !== null &&
       this.qs.length > 0 &&
-      this.qs.every((q) => q.solutionFile !== null && q.submissionFile !== null)
+      this.qs.every((q) => q.submissionFile !== null)
     );
   }
 
   completedCount(): number {
-    return this.qs.filter((q) => q.solutionFile && q.submissionFile).length;
+    return this.qs.filter((q) => q.submissionFile).length;
   }
 
   onFileSelected(
@@ -306,42 +216,36 @@ export class EvaluationsComponent implements OnInit {
     this.qs.forEach((q, index) => {
       formData.append(`question_${index}`, q.questionId.toString());
 
-      if (q.solutionFile) {
-        formData.append(`solution_${index}`, q.solutionFile);
-      }
-
       if (q.submissionFile) {
         formData.append(`submission_${index}`, q.submissionFile);
       }
     });
 
-    this.http
-      .post('http://localhost:8080/api/mock-interview/evaluate-multi', formData)
-      .subscribe({
-        next: (res: any) => {
-          this.submissionState.update((s) => ({
-            ...s,
-            isLoading: false,
-            isSuccess: true,
-            result: res,
-          }));
-        },
+    this.evaluationService.evaluateAssessment(formData).subscribe({
+      next: (res) => {
+        this.submissionState.update((s) => ({
+          ...s,
+          isLoading: false,
+          isSuccess: true,
+          result: res,
+        }));
+      },
 
-        error: () => {
-          this.submissionState.update((s) => ({
-            ...s,
-            isLoading: false,
-            isError: true,
-            errorMessage: 'Evaluation failed',
-          }));
-        },
-      });
+      error: () => {
+        this.submissionState.update((s) => ({
+          ...s,
+          isLoading: false,
+          isError: true,
+          errorMessage: 'Evaluation failed',
+        }));
+      },
+    });
   }
 
   reset(): void {
-    this.selectedAssessmentId = null;
+    this.selectedCandidateId = null;
 
-    this.candidateName = '';
+    this.assessmentTitle = '';
 
     this.qs = [];
 

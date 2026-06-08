@@ -20,7 +20,7 @@ export class AuthService {
   constructor(
     private apiInterface: APIInterfaceService,
     private router: Router,
-  ) { }
+  ) {}
 
   login(formDetails: LoginRequest): Observable<ApiResponse<LoginResponse>> {
     return this.apiInterface.post<LoginResponse>(
@@ -95,11 +95,7 @@ export class AuthService {
     };
   }
 
-  setToken(
-    accessToken: string,
-    refreshToken: string,
-    user?: any,
-  ) {
+  setToken(accessToken: string, refreshToken: string, user?: any) {
     localStorage.setItem('accessToken', accessToken);
 
     localStorage.setItem('refreshToken', refreshToken);

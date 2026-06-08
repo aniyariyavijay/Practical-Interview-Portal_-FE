@@ -13,17 +13,24 @@ export interface EvaluationResult {
   securityIssues: string[];
   optimizedCode: string;
 }
-
 export interface QuestionEvaluationResult {
+  questionId: number;
   questionNumber: number;
   questionTopic: string;
-  evaluation: EvaluationResult;
+  score: number;
+  feedback: string;
+  timeComplexity: string;
+  spaceComplexity: string;
+  missedEdgeCases: string[];
+  securityIssues: string[];
+  optimizedCode: string;
 }
 
 export interface MultiQuestionEvaluationResult {
+  isSuccess: boolean;
   overallScore: number;
   totalQuestions: number;
-  results: QuestionEvaluationResult[];
+  evaluations: QuestionEvaluationResult[];
 }
 
 export interface SubmissionState {
@@ -33,10 +40,13 @@ export interface SubmissionState {
   errorMessage: string | null;
   result: MultiQuestionEvaluationResult | null;
 }
-
 export interface AssessmentListItem {
   id: number;
   title: string;
+  candidateName: string;
+}
+export interface CandidateListItem {
+  id: number;
   candidateName: string;
 }
 
@@ -45,4 +55,7 @@ export interface QuestionItem {
   questionTopic: string;
   solutionFile: File | null;
   submissionFile: File | null;
+
+  solutionFileName?: string;
+  solutionFileId?: number;
 }

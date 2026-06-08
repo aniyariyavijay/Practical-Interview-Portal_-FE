@@ -6,22 +6,22 @@
       <div class="topbar-left">
         <mat-form-field appearance="outline" class="assessment-select">
           <mat-select
-            [value]="selectedAssessmentId"
-            (selectionChange)="onAssessmentChange($event.value)"
-            placeholder="Select Assessment"
+            [value]="selectedCandidateId"
+            (selectionChange)="onCandidateChange($event.value)"
+            placeholder="Select Candidate"
           >
-            @for (item of assessments; track item.id) {
+            @for (item of candidates; track item.id) {
               <mat-option [value]="item.id">
-                {{ item.title }}
+                {{ item.candidateName }}
               </mat-option>
             }
           </mat-select>
         </mat-form-field>
 
-        @if (candidateName) {
+        @if (assessmentTitle) {
           <div class="candidate-pill">
-            <span class="candidate-pill-label">Candidate</span>
-            <span class="candidate-pill-name">{{ candidateName }}</span>
+            <span class="candidate-pill-label">Assessment</span>
+            <span class="candidate-pill-name">{{ assessmentTitle }}</span>
           </div>
         }
       </div>
@@ -111,7 +111,7 @@
               {{ submissionState().result!.overallScore }}
             </div>
             <div class="big-score-meta">
-              <span>/100</span>
+              <span>/10</span>
               <span
                 class="score-label-tag"
                 [style.color]="
@@ -137,18 +137,15 @@
 
         <!-- Per-Question Cards -->
         @for (
-          qr of submissionState().result!.results;
+          qr of submissionState().result!.evaluations;
           track qr.questionNumber
         ) {
           <div class="q-result-card">
             <div class="q-result-head">
               <div class="q-num-badge">Q{{ qr.questionNumber }}</div>
               <div class="q-result-topic">{{ qr.questionTopic }}</div>
-              <div
-                class="q-result-score"
-                [style.color]="scoreColor(qr.evaluation.score)"
-              >
-                {{ qr.evaluation.score }}<small>/100</small>
+              <div class="q-result-score" [style.color]="scoreColor(qr.score)">
+                {{ qr.score }}<small>/10</small>
               </div>
             </div>
 
@@ -156,16 +153,16 @@
             <div class="chips-row">
               <div class="chip chip--time">
                 <span>Time</span>
-                <code>{{ qr.evaluation.timeComplexity || "N/A" }}</code>
+                <code>{{ qr.timeComplexity || "N/A" }}</code>
               </div>
               <div class="chip chip--space">
                 <span>Space</span>
-                <code>{{ qr.evaluation.spaceComplexity || "N/A" }}</code>
+                <code>{{ qr.spaceComplexity || "N/A" }}</code>
               </div>
               <div class="chip chip--rating">
                 <span>Rating</span>
-                <code [style.color]="scoreColor(qr.evaluation.score)">
-                  {{ scoreLabel(qr.evaluation.score) }}
+                <code [style.color]="scoreColor(qr.score)">
+                  {{ scoreLabel(qr.score) }}
                 </code>
               </div>
             </div>
@@ -173,19 +170,17 @@
             <!-- Feedback -->
             <div class="result-section">
               <p class="section-label">Feedback</p>
-              <p class="section-body">{{ qr.evaluation.feedback }}</p>
+              <p class="section-body">{{ qr.feedback }}</p>
             </div>
 
             <!-- Edge Cases -->
-            @if (qr.evaluation.missedEdgeCases?.length) {
+            @if (qr.missedEdgeCases?.length) {
               <div class="result-section">
                 <p class="section-label section-label--warn">
-                  ⚠ Missed Edge Cases ({{
-                    qr.evaluation.missedEdgeCases.length
-                  }})
+                  ⚠ Missed Edge Cases ({{ qr.missedEdgeCases.length }})
                 </p>
                 <ul class="issue-list">
-                  @for (item of qr.evaluation.missedEdgeCases; track $index) {
+                  @for (item of qr.missedEdgeCases; track $index) {
                     <li>{{ item }}</li>
                   }
                 </ul>
@@ -193,13 +188,13 @@
             }
 
             <!-- Security -->
-            @if (qr.evaluation.securityIssues?.length) {
+            @if (qr.securityIssues?.length) {
               <div class="result-section">
                 <p class="section-label section-label--danger">
-                  🔴 Security Issues ({{ qr.evaluation.securityIssues.length }})
+                  🔴 Security Issues ({{ qr.securityIssues.length }})
                 </p>
                 <ul class="issue-list issue-list--danger">
-                  @for (item of qr.evaluation.securityIssues; track $index) {
+                  @for (item of qr.securityIssues; track $index) {
                     <li>{{ item }}</li>
                   }
                 </ul>
@@ -207,7 +202,7 @@
             }
 
             <!-- Optimized Code -->
-            @if (qr.evaluation.optimizedCode) {
+            @if (qr.optimizedCode) {
               <details class="code-accordion">
                 <summary>
                   <svg
@@ -225,7 +220,7 @@
                 </summary>
                 <pre
                   class="code-block"
-                ><code>{{ qr.evaluation.optimizedCode }}</code></pre>
+                ><code>{{ qr.optimizedCode }}</code></pre>
               </details>
             }
           </div>
@@ -268,7 +263,7 @@
             <!-- Files Row -->
             <div class="files-row">
               <!-- Solution Zone -->
-              <div
+              <!-- <div
                 class="drop-zone"
                 [class.drop-zone--hover]="isDraggingSol(i)"
                 [class.drop-zone--filled]="q.solutionFile"
@@ -305,11 +300,34 @@
                         formatSize(q.solutionFile.size)
                       }}</span>
                     </div>
-                    <button class="icon-btn" (click)="clearFile(i, 'solution')">
+                    <!-- <button class="icon-btn" (click)="clearFile(i, 'solution')">
                       ✕
-                    </button>
+                    </button> -->
+              <!-- </div> -->
+              <!-- } -->
+              <!-- </div> -->
+
+              <div class="drop-zone drop-zone--filled solution-readonly">
+                <div class="zone-head">
+                  <span class="tag tag--solution">SOLUTION</span>
+                  <span class="zone-hint">AI Generated Reference</span>
+                </div>
+
+                <div class="file-pill file-pill--readonly">
+                  <span class="file-pill-icon">☕</span>
+
+                  <div class="file-pill-info">
+                    <span class="file-pill-name">
+                      {{ q.solutionFileName }}
+                    </span>
+
+                    <!-- <span class="file-pill-size">
+                      Reference solution available
+                    </span> -->
                   </div>
-                }
+
+                  <!-- <button type="button" class="preview-btn">View</button> -->
+                </div>
               </div>
 
               <!-- Submission Zone -->

@@ -1,4 +1,3 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiResponse } from '../../../shared/interfaces/api-response.interface';
@@ -12,8 +11,7 @@ import { API_ROUTES } from '../../../shared/common/api-routes';
 export class QuestionService {
 
   constructor(
-    private apiInterface: APIInterfaceService,
-    private readonly http: HttpClient) { }
+    private apiInterface: APIInterfaceService) { }
 
   getQuestions(): Observable<ApiResponse<Question[]>> {    
     return this.apiInterface.get<Question[]>(API_ROUTES.QUESTIONS.GET_ALL);

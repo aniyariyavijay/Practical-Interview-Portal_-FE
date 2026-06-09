@@ -7,12 +7,21 @@ export const API_ROUTES = {
     RESET_PASSWORD: '/auth/reset-password',
     VALIDATE_RESET_TOKEN: '/auth/validate-reset-token',
   },
-  QUESTIONS:{
+  QUESTIONS: {
     GET_ALL: '/questions',
     GET_BY_ID: '/questions/',
     CREATE: '/questions',
     UPDATE: '/questions/',
     DELETE: '/questions/',
     GET_ALL_CATEGORIES: '/questions/category'
+  },
+  DASHBOARD: {
+    STATS: 'dashboard/stats',
+    ASSESSMENT_STATUS: '/dashboard/assessment-status',
+    CANDIDATE_PIPELINE: '/dashboard/candidate-pipeline',
+    RECENT_SUBMISSIONS: '/dashboard/recent-submissions',
+    QUESTIONS_BY_DIFF: '/dashboard/questions-by-difficulty',
+    AI_SCORE_DIST: '/dashboard/ai-score-distribution',
+    RECENT_ACTIVITY: '/dashboard/recent-activity',
   }
 };

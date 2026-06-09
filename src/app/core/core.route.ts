@@ -11,8 +11,8 @@ export const coreRoutes: Routes = [
       {
         path: 'dashboard',
         loadComponent: () =>
-          import('../modules/dashboard/components/dashboard/dashboard').then(
-            (m) => m.Dashboard,
+          import('../modules/dashboard/components/dashboard/dashboard.component').then(
+            (m) => m.DashboardComponent,
           ),
       },
 

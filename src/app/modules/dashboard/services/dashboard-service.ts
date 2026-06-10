@@ -1,58 +1,67 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ActivityItem, AiScoreDistribution, AssessmentStatusBreakdown, CandidatePipeline, DashboardData, DashboardStats, QuestionsByDifficulty, RecentSubmission } from '../interfaces/dashboard.interface';
 import { Observable, forkJoin, map } from 'rxjs';
+import {
+  ActivityItem,
+  AiScoreDistribution,
+  AssessmentStatusBreakdown,
+  CandidatePipeline,
+  DashboardData,
+  DashboardStats,
+  QuestionsByDifficulty,
+  RecentSubmission,
+} from '../interfaces/dashboard.interface';
 import { ApiResponse } from '../../../shared/interfaces/api-response.interface';
-import { APIInterfaceService } from '../../../shared/services/api-interface.service';
-import { API_ROUTES } from '../../../shared/common/api-routes';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DashboardService {
- 
-  constructor(private readonly api: APIInterfaceService) {}
- 
+
+  private readonly apiUrl = 'http://localhost:8080/api/dashboard';
+
+  constructor(private readonly http: HttpClient) { }
+
   getStats(): Observable<ApiResponse<DashboardStats>> {
-    return this.api.get<DashboardStats>(API_ROUTES.DASHBOARD.STATS);
+    return this.http.get<ApiResponse<DashboardStats>>(`${this.apiUrl}/stats`);
   }
- 
+
   getAssessmentStatusBreakdown(days = 30): Observable<ApiResponse<AssessmentStatusBreakdown[]>> {
     const params = new HttpParams().set('days', days);
-    return this.api.get<AssessmentStatusBreakdown[]>(API_ROUTES.DASHBOARD.ASSESSMENT_STATUS, params);
+    return this.http.get<ApiResponse<AssessmentStatusBreakdown[]>>(`${this.apiUrl}/assessment-status`, { params });
   }
- 
+
   getCandidatePipeline(): Observable<ApiResponse<CandidatePipeline>> {
-    return this.api.get<CandidatePipeline>(API_ROUTES.DASHBOARD.CANDIDATE_PIPELINE);
+    return this.http.get<ApiResponse<CandidatePipeline>>(`${this.apiUrl}/candidate-pipeline`);
   }
- 
+
   getRecentSubmissions(limit = 5): Observable<ApiResponse<RecentSubmission[]>> {
     const params = new HttpParams().set('limit', limit);
-    return this.api.get<RecentSubmission[]>(API_ROUTES.DASHBOARD.RECENT_SUBMISSIONS, params);
+    return this.http.get<ApiResponse<RecentSubmission[]>>(`${this.apiUrl}/recent-submissions`, { params });
   }
- 
+
   getQuestionsByDifficulty(): Observable<ApiResponse<QuestionsByDifficulty[]>> {
-    return this.api.get<QuestionsByDifficulty[]>(API_ROUTES.DASHBOARD.QUESTIONS_BY_DIFF);
+    return this.http.get<ApiResponse<QuestionsByDifficulty[]>>(`${this.apiUrl}/questions-by-difficulty`);
   }
- 
+
   getAiScoreDistribution(): Observable<ApiResponse<AiScoreDistribution[]>> {
-    return this.api.get<AiScoreDistribution[]>(API_ROUTES.DASHBOARD.AI_SCORE_DIST);
+    return this.http.get<ApiResponse<AiScoreDistribution[]>>(`${this.apiUrl}/ai-score-distribution`);
   }
- 
+
   getRecentActivity(limit = 5): Observable<ApiResponse<ActivityItem[]>> {
     const params = new HttpParams().set('limit', limit);
-    return this.api.get<ActivityItem[]>(API_ROUTES.DASHBOARD.RECENT_ACTIVITY, params);
+    return this.http.get<ApiResponse<ActivityItem[]>>(`${this.apiUrl}/recent-activity`, { params });
   }
- 
-  loadAll(): Observable<DashboardData> {    
+
+  loadAll(): Observable<DashboardData> {
     return forkJoin({
-      stats:                     this.getStats().pipe(map((r) => r.result!)),
+      stats: this.getStats().pipe(map((r) => r.result!)),
       assessmentStatusBreakdown: this.getAssessmentStatusBreakdown().pipe(map((r) => r.result!)),
-      candidatePipeline:         this.getCandidatePipeline().pipe(map((r) => r.result!)),
-      recentSubmissions:         this.getRecentSubmissions().pipe(map((r) => r.result!)),
-      questionsByDifficulty:     this.getQuestionsByDifficulty().pipe(map((r) => r.result!)),
-      aiScoreDistribution:       this.getAiScoreDistribution().pipe(map((r) => r.result!)),
-      recentActivity:            this.getRecentActivity().pipe(map((r) => r.result!)),
+      candidatePipeline: this.getCandidatePipeline().pipe(map((r) => r.result!)),
+      recentSubmissions: this.getRecentSubmissions().pipe(map((r) => r.result!)),
+      questionsByDifficulty: this.getQuestionsByDifficulty().pipe(map((r) => r.result!)),
+      aiScoreDistribution: this.getAiScoreDistribution().pipe(map((r) => r.result!)),
+      recentActivity: this.getRecentActivity().pipe(map((r) => r.result!)),
     });
   }
 }

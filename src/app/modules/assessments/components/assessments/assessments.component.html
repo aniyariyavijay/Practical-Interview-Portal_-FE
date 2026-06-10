@@ -1,1 +1,204 @@
-<p>assessments works!</p>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<div class="assessments-wrapper">
+
+  <!-- Toast -->
+  <div *ngIf="toast" class="toast" [ngClass]="'toast--' + toast.type">
+    {{ toast.msg }}
+  </div>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header__text">
+      <h1 class="header__title">Assessments</h1>
+      <p class="header__subtitle">Create and manage assessments</p>
+    </div>
+    <button class="btn btn--primary" (click)="openModal()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="12" y1="5" x2="12" y2="19"/>
+        <line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      New assessment
+    </button>
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="assessments.length === 0" class="empty-state">
+    <div class="empty-state__icon">📋</div>
+    <p class="empty-state__title">No assessments yet</p>
+    <p class="empty-state__subtitle">Create your first assessment to get started</p>
+  </div>
+
+  <!-- Assessment list -->
+  <div class="assessment-list">
+    <div
+      *ngFor="let a of assessments; trackBy: trackById"
+      class="assessment-card"
+    >
+      <div class="assessment-card__info">
+        <div class="assessment-card__top">
+          <span class="assessment-card__title">{{ a.title }}</span>
+          <span [ngClass]="getStatusClass(a.status)">{{ a.status }}</span>
+        </div>
+        <p class="assessment-card__desc">{{ a.description || '—' }}</p>
+        <p class="assessment-card__meta">
+          {{ a.questionIds.length }} question{{ a.questionIds.length !== 1 ? 's' : '' }}
+          &nbsp;·&nbsp;
+          {{ a.candidateIds.length }} candidate{{ a.candidateIds.length !== 1 ? 's' : '' }}
+        </p>
+      </div>
+
+      <div class="assessment-card__actions">
+        <select
+          class="status-select"
+          [ngModel]="a.status"
+          (ngModelChange)="setStatus(a.id, $event)"
+        >
+          <option value="draft">Draft</option>
+          <option value="published">Published</option>
+          <option value="completed">Completed</option>
+        </select>
+
+        <button class="btn-delete" (click)="remove(a.id)" title="Delete">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6l-1 14H6L5 6"/>
+            <path d="M10 11v6M14 11v6"/>
+            <path d="M9 6V4h6v2"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal backdrop -->
+  <div *ngIf="open" class="modal-backdrop" (click)="closeModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+
+      <!-- Modal header -->
+      <div class="modal__header">
+        <div>
+          <h2 class="modal__title">Create assessment</h2>
+          <p class="modal__step-label">Step {{ step }} of 3</p>
+        </div>
+        <button class="modal__close" (click)="closeModal()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Step indicator -->
+      <div class="step-indicator">
+        <div
+          *ngFor="let s of [1, 2, 3]"
+          class="step-indicator__bar"
+          [class.step-indicator__bar--active]="s <= step"
+        ></div>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal__body">
+
+        <!-- Step 1: Details -->
+        <div *ngIf="step === 1" class="form-group-stack">
+          <div class="form-group">
+            <label class="form-label">Title</label>
+            <input
+              class="form-input"
+              [(ngModel)]="draft.title"
+              placeholder="e.g. Frontend Engineer Round 1"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea
+              class="form-textarea"
+              rows="3"
+              [(ngModel)]="draft.description"
+              placeholder="Optional description..."
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Step 2: Questions -->
+        <div *ngIf="step === 2">
+          <label class="form-label">
+            Select questions
+            <span class="form-label__count">({{ draft.questionIds.length }} selected)</span>
+          </label>
+          <div class="checklist">
+            <label
+              *ngFor="let q of staticQuestions; trackBy: trackById"
+              class="checklist__item"
+              [class.checklist__item--checked]="isQuestionSelected(q.id)"
+              (click)="toggleQuestion(q.id)"
+            >
+              <div class="checkbox" [class.checkbox--checked]="isQuestionSelected(q.id)">
+                <svg *ngIf="isQuestionSelected(q.id)" width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5">
+                  <polyline points="2,6 5,9 10,3"/>
+                </svg>
+              </div>
+              <div class="checklist__text">
+                <p class="checklist__name">{{ q.title }}</p>
+                <p class="checklist__sub">{{ q.type }} · {{ q.difficulty }}</p>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Step 3: Candidates -->
+        <div *ngIf="step === 3">
+          <label class="form-label">
+            Assign candidates
+            <span class="form-label__count">({{ draft.candidateIds.length }} selected)</span>
+          </label>
+          <div class="checklist">
+            <label
+              *ngFor="let c of staticCandidates; trackBy: trackById"
+              class="checklist__item"
+              [class.checklist__item--checked]="isCandidateSelected(c.id)"
+              (click)="toggleCandidate(c.id)"
+            >
+              <div class="checkbox" [class.checkbox--checked]="isCandidateSelected(c.id)">
+                <svg *ngIf="isCandidateSelected(c.id)" width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5">
+                  <polyline points="2,6 5,9 10,3"/>
+                </svg>
+              </div>
+              <div class="avatar">{{ c.initials }}</div>
+              <div class="checklist__text">
+                <p class="checklist__name">{{ c.name }}</p>
+                <p class="checklist__sub">{{ c.email }}</p>
+              </div>
+            </label>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal__footer">
+        <button class="btn btn--ghost" [disabled]="step === 1" (click)="prevStep()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="15,18 9,12 15,6"/>
+          </svg>
+          Back
+        </button>
+
+        <button *ngIf="step < 3" class="btn btn--primary" (click)="nextStep()">
+          Next
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="9,18 15,12 9,6"/>
+          </svg>
+        </button>
+
+        <button *ngIf="step === 3" class="btn btn--primary" (click)="create()">
+          Create assessment
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>

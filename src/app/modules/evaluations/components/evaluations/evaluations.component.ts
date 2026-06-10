@@ -201,7 +201,9 @@ export class EvaluationsComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (!this.selectedAssessmentId) return;
+    if (!this.selectedAssessmentId || !this.selectedCandidateId) {
+      return;
+    }
 
     this.submissionState.update((s) => ({
       ...s,
@@ -212,9 +214,10 @@ export class EvaluationsComponent implements OnInit {
 
     formData.append('totalQuestions', this.qs.length.toString());
     formData.append('assessmentId', this.selectedAssessmentId.toString());
+    formData.append('candidateId', this.selectedCandidateId?.toString());
 
     this.qs.forEach((q, index) => {
-      formData.append(`question_${index}`, q.questionId.toString());
+      formData.append(`questionId_${index}`, q.questionId.toString());
 
       if (q.submissionFile) {
         formData.append(`submission_${index}`, q.submissionFile);

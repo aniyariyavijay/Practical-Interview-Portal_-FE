@@ -145,6 +145,26 @@
                         <span class="error-msg" *ngIf="isInvalid('estimatedTime')">Estimated time is required</span>
                     </div>
 
+                    <!-- Designation -->
+                    <div class="form-card">
+                        <div class="card-title">
+                            <mat-icon>badge</mat-icon>
+                            Designations
+                            <span class="required">*</span>
+                        </div>
+
+                        <div class="categories-grid">
+                            <label class="category-option" *ngFor="let des of designations"
+                                [class.selected]="isDesignationSelected(des)">
+
+                                <input type="checkbox" [checked]="isDesignationSelected(des)"
+                                    (change)="toggleDesignation(des)" hidden />
+
+                                {{ des }}
+                            </label>
+                        </div>
+                    </div>
+
                     <!-- Status -->
                     <div class="form-field">
                         <label>Status</label>

@@ -38,6 +38,8 @@ export class QuestionBankFormComponent {
 
   availableLanguages: string[] = ['Java', 'Python', 'JavaScript', 'C++', 'Go'];
 
+  designations: string[] = ['TSE', 'ASE', 'SE', 'SSE', 'TL', 'STL', 'APM', 'PM', 'PPM'];
+
   allCategories: Category[] = [];
 
   activeSolutionIndex = 0;
@@ -67,6 +69,7 @@ export class QuestionBankFormComponent {
       description: ['', Validators.required],
       difficulty: ['', Validators.required],
       estimatedTime: [null, [Validators.required, Validators.min(1)]],
+      designations: [[], [CustomValidators.minLengthArray(1)]],
       isActive: [true],
       solutions: this.fb.array([], [CustomValidators.minLengthArray(1)]),
       categories: [[], [CustomValidators.minLengthArray(1)]]
@@ -103,6 +106,7 @@ export class QuestionBankFormComponent {
           difficulty: response.result.difficulty,
           estimatedTime: response.result.estimatedTime,
           isActive: response.result.isActive,
+          designations: response.result.designations || [],
           categories: response.result.categories || []
         });
 
@@ -175,13 +179,14 @@ export class QuestionBankFormComponent {
     this.submitted = true;
     this.questionForm.markAllAsTouched();
 
-    if (this.questionForm.invalid) {      
+    if (this.questionForm.invalid) {
       return;
     }
 
     const payload = {
       ...this.questionForm.value,
-      categoryIds: this.categoriesControl.value.map((cat: Category) => cat.id)
+      categoryIds: this.categoriesControl.value.map((cat: Category) => cat.id),
+      designations: this.designationsControl.value
     };
     delete payload.categories;
 
@@ -198,7 +203,7 @@ export class QuestionBankFormComponent {
     this.questionService.createQuestion(payload).subscribe({
       next: () => {
         this.toastr.success('Question created successfully!');
-        this.goBack(); 
+        this.goBack();
       },
       error: (err) => {
         this.toastr.error('Failed to create question.');
@@ -221,9 +226,9 @@ export class QuestionBankFormComponent {
   }
 
   isLanguageDisabled(languageToCheck: string, currentIndex: number): boolean {
-    const allSolutions = this.solutions.value; 
+    const allSolutions = this.solutions.value;
 
-    return allSolutions.some((sol: any, index: number) => 
+    return allSolutions.some((sol: any, index: number) =>
       sol.language === languageToCheck && index !== currentIndex
     );
   }
@@ -237,7 +242,7 @@ export class QuestionBankFormComponent {
 
   onFileUpload(event: Event, index: number): void {
     const input = event.target as HTMLInputElement;
-    
+
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
       const reader = new FileReader();
@@ -248,7 +253,7 @@ export class QuestionBankFormComponent {
 
         // Find the specific form group in the array
         const solutionGroup = this.solutions.at(index);
-        
+
         // Patch the text area with the file contents!
         solutionGroup.patchValue({
           solutionCode: fileContent
@@ -260,9 +265,9 @@ export class QuestionBankFormComponent {
 
       // Read the file as raw text
       reader.readAsText(file);
-      
+
       // Clear the input so the user can upload the same file again if they want
-      input.value = ''; 
+      input.value = '';
     }
   }
 
@@ -285,14 +290,38 @@ export class QuestionBankFormComponent {
   onLanguageChange(index: number): void {
     // 1. Grab the specific form group from the array using the index
     const solutionGroup = this.solutions.at(index);
-    
+
     // 2. Patch the code value to an empty string!
     solutionGroup.patchValue({
       solutionCode: ''
     });
   }
-  
+
   goBack(): void {
     this.router.navigate(['/question-bank']);
+  }
+
+  get designationsControl() {
+    return this.questionForm.get('designations')!;
+  }
+
+  isDesignationSelected(designation: string): boolean {
+    const selected = this.designationsControl.value as string[];
+    return selected.includes(designation);
+  }
+
+  toggleDesignation(designation: string): void {
+    const selected = [...(this.designationsControl.value as string[])];
+
+    const index = selected.indexOf(designation);
+
+    if (index >= 0) {
+      selected.splice(index, 1);
+    } else {
+      selected.push(designation);
+    }
+
+    this.designationsControl.setValue(selected);
+    this.designationsControl.markAsTouched();
   }
 }

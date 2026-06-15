@@ -254,3 +254,24 @@
   .action-btn.delete {
     color: #dc2626;
   }
+
+.designations-cell {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.designation-chip {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #4338ca;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.designation-chip.more {
+  background: #f3f4f6;
+  color: #6b7280;
+}

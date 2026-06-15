@@ -36,7 +36,7 @@ import { ApiResponse } from '../../../../shared/interfaces/api-response.interfac
 })
 export class QuestionBankComponent {
 
-  displayedColumns: string[] = ['title', 'difficulty', 'categories', 'status', 'actions'];
+  displayedColumns: string[] = ['title', 'difficulty', 'categories','designations', 'status', 'actions'];
 
   dataSource = new MatTableDataSource<Question>([]);
 

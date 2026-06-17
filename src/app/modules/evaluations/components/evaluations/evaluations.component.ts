@@ -27,6 +27,8 @@ export class EvaluationsComponent implements OnInit {
   selectedAssessmentId: number | null = null;
   selectedCandidateId: number | null = null;
 
+  hasNoAssessment = false;
+
   assessmentTitle = '';
 
   qs: QuestionItem[] = [];
@@ -59,13 +61,23 @@ export class EvaluationsComponent implements OnInit {
   }
 
   onCandidateChange(candidateId: number) {
+    this.hasNoAssessment = false;
     this.selectedCandidateId = candidateId;
     this.qs = [];
+    this.submissionState.update((s) => ({
+      ...s,
+      isSuccess: false,
+      result: null,
+    }));
     this.evaluationService.getCandidateEvaluation(candidateId).subscribe({
       next: (res) => {
         this.selectedAssessmentId = res.assessmentId;
         this.assessmentTitle = res.assessmentTitle;
 
+        if (!res.assessmentId) {
+          this.hasNoAssessment = true;
+          return;
+        }
         if (res.isEvaluated) {
           this.submissionState.update((s) => ({
             ...s,
@@ -75,11 +87,6 @@ export class EvaluationsComponent implements OnInit {
 
           return;
         }
-        this.submissionState.update((s) => ({
-          ...s,
-          isSuccess: false,
-          result: null,
-        }));
         this.qs = res.questions.map((q: any) => ({
           questionId: q.questionId,
           questionTopic: q.questionTitle,
@@ -88,6 +95,9 @@ export class EvaluationsComponent implements OnInit {
           solutionFile: null,
           submissionFile: null,
         }));
+      },
+      error: () => {
+        this.hasNoAssessment = true;
       },
     });
   }

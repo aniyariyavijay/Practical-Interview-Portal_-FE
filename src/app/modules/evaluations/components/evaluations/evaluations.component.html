@@ -10,10 +10,14 @@
             (selectionChange)="onCandidateChange($event.value)"
             placeholder="Select Candidate"
           >
-            @for (item of candidates; track item.id) {
-              <mat-option [value]="item.id">
-                {{ item.candidateName }}
-              </mat-option>
+            @if (candidates.length === 0) {
+              <mat-option disabled> No candidates available </mat-option>
+            } @else {
+              @for (item of candidates; track item.id) {
+                <mat-option [value]="item.id">
+                  {{ item.candidateName }}
+                </mat-option>
+              }
             }
           </mat-select>
         </mat-form-field>
@@ -232,6 +236,20 @@
       </div>
     }
 
+    @if (!selectedCandidateId && !submissionState().isSuccess) {
+      <div class="empty-state">
+        <div class="empty-state-icon">👨‍💻</div>
+
+        <p>Select a candidate to view assessment questions</p>
+      </div>
+    }
+    @if (hasNoAssessment && !submissionState().isSuccess) {
+      <div class="empty-state">
+        <div class="empty-state-icon">📋</div>
+
+        <p>No assessment has been assigned to this candidate</p>
+      </div>
+    }
     <!-- ══════════════════ FORM VIEW ══════════════════ -->
     @if (!submissionState().isSuccess) {
       <div class="form-area">

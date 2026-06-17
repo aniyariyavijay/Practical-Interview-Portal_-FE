@@ -1,230 +1,331 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
-export interface Question {
-  id: string;
-  title: string;
-  type: string;
-  difficulty: string;
-}
-
-export interface Candidate {
-  id: string;
-  name: string;
-  email: string;
-  initials?: string;
-}
-
-export interface Assessment {
-  id: string;
-  title: string;
-  description: string;
-  status: 'draft' | 'published' | 'completed';
-  questionIds: string[];
-  candidateIds: string[];
-  createdAt: string;
-}
-
-export interface Draft {
-  title: string;
-  description: string;
-  questionIds: string[];
-  candidateIds: string[];
-}
-
-export interface Toast {
-  msg: string;
-  type: 'success' | 'error';
-}
+import { ToastrService } from 'ngx-toastr';
+import { forkJoin } from 'rxjs';
+import { AssessmentService } from '../../services/assessment.service';
+import { Assessment, AssessmentRequest } from '../../interfaces/assessment';
+import { Question } from '../../../question-bank/interfaces/question.interfase';
+import { CandidatesService } from '../../../../core/auth/services/candidates.service';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import {
+  LucideAngularModule,
+  Plus,
+  Trash2,
+  FileText,
+  AlignLeft,
+} from 'lucide-angular';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-assessments',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    LucideAngularModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatIconModule,
+  ],
   templateUrl: './assessments.component.html',
   styleUrls: ['./assessments.component.scss'],
 })
 export class AssessmentsComponent implements OnInit {
-  private _uid = 100;
+  assessments: Assessment[] = [];
 
-  staticQuestions: Question[] = [
-    {
-      id: 'q1',
-      title: 'Reverse a linked list',
-      type: 'coding',
-      difficulty: 'medium',
-    },
-    {
-      id: 'q2',
-      title: 'Explain REST vs GraphQL',
-      type: 'theory',
-      difficulty: 'easy',
-    },
-    {
-      id: 'q3',
-      title: 'Design a rate limiter',
-      type: 'system-design',
-      difficulty: 'hard',
-    },
-    {
-      id: 'q4',
-      title: 'Find duplicate in array',
-      type: 'coding',
-      difficulty: 'easy',
-    },
-    {
-      id: 'q5',
-      title: 'Binary search tree traversal',
-      type: 'coding',
-      difficulty: 'medium',
-    },
-  ];
+  candidates: any[] = [];
 
-  staticCandidates: Candidate[] = [
-    { id: 'c1', name: 'Aisha Mehta', email: 'aisha.mehta@example.com' },
-    { id: 'c2', name: 'Carlos Romero', email: 'carlos.r@example.com' },
-    { id: 'c3', name: 'Priya Nair', email: 'priya.nair@example.com' },
-    { id: 'c4', name: 'Jordan Lee', email: 'jordan.lee@example.com' },
-  ];
+  recommendedQuestions: Question[] = [];
 
-  assessments: Assessment[] = [
-    {
-      id: 'a1',
-      title: 'Frontend Engineer — Round 1',
-      description: 'Covers React fundamentals and system design basics.',
-      status: 'published',
-      questionIds: ['q1', 'q2'],
-      candidateIds: ['c1', 'c2'],
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 'a2',
-      title: 'Backend Screening',
-      description: '',
-      status: 'draft',
-      questionIds: ['q3'],
-      candidateIds: [],
-      createdAt: new Date().toISOString(),
-    },
-  ];
+  isLoading = false;
+
+  isGeneratingQuestions = false;
+
+  isCreatingAssessment = false;
 
   open = false;
+
   step = 1;
-  draft: Draft = {
+  readonly Plus = Plus;
+  readonly Trash2 = Trash2;
+  readonly FileText = FileText;
+  readonly AlignLeft = AlignLeft;
+  draft = {
+    candidateId: null as number | null,
     title: '',
-    description: '',
-    questionIds: [],
-    candidateIds: [],
+    timeLimitMinutes: 90,
+    questionIds: [] as number[],
   };
-  toast: Toast | null = null;
-  private toastTimer: any;
+
+  constructor(
+    private readonly assessmentService: AssessmentService,
+    private readonly toastr: ToastrService,
+    private readonly candidatesService: CandidatesService,
+  ) {}
 
   ngOnInit(): void {
-    // Precompute candidate initials
-    this.staticCandidates = this.staticCandidates.map((c) => ({
-      ...c,
-      initials: c.name
-        .split(' ')
-        .map((n) => n[0])
-        .join('')
-        .toUpperCase(),
-    }));
+    this.loadData();
   }
 
-  private uid(): string {
-    return `id_${++this._uid}`;
-  }
+  private loadData(): void {
+    this.isLoading = true;
 
-  showToast(msg: string, type: 'success' | 'error' = 'success'): void {
-    if (this.toastTimer) clearTimeout(this.toastTimer);
-    this.toast = { msg, type };
-    this.toastTimer = setTimeout(() => (this.toast = null), 2500);
-  }
+    forkJoin({
+      assessments: this.assessmentService.getAll(),
+      candidates: this.candidatesService.getCandidates(),
+    }).subscribe({
+      next: ({ assessments, candidates }) => {
+        this.assessments = assessments.result ?? [];
 
-  reset(): void {
-    this.draft = {
-      title: '',
-      description: '',
-      questionIds: [],
-      candidateIds: [],
-    };
-    this.step = 1;
+        this.candidates = candidates.result ?? [];
+
+        this.isLoading = false;
+      },
+
+      error: () => {
+        this.isLoading = false;
+
+        this.toastr.error('Failed to load assessments');
+      },
+    });
   }
 
   openModal(): void {
+    this.resetDraft();
+
     this.open = true;
   }
 
   closeModal(): void {
     this.open = false;
-    this.reset();
+
+    this.resetDraft();
   }
 
-  create(): void {
-    if (!this.draft.title.trim()) {
-      this.showToast('Title is required', 'error');
-      return;
-    }
-    const newAssessment: Assessment = {
-      id: this.uid(),
-      status: 'draft',
-      createdAt: new Date().toISOString(),
-      title: this.draft.title,
-      description: this.draft.description,
-      questionIds: [...this.draft.questionIds],
-      candidateIds: [...this.draft.candidateIds],
+  private resetDraft(): void {
+    this.step = 1;
+
+    this.recommendedQuestions = [];
+
+    this.draft = {
+      candidateId: null,
+      title: '',
+      timeLimitMinutes: 90,
+      questionIds: [],
     };
-    this.assessments = [newAssessment, ...this.assessments];
-    this.showToast('Assessment created');
-    this.closeModal();
   }
 
-  setStatus(id: string, status: 'draft' | 'published' | 'completed'): void {
-    this.assessments = this.assessments.map((a) =>
-      a.id === id ? { ...a, status } : a,
-    );
-    this.showToast(`Marked ${status}`);
+  selectCandidate(candidateId: number): void {
+    this.draft.candidateId = candidateId;
   }
 
-  remove(id: string): void {
-    this.assessments = this.assessments.filter((a) => a.id !== id);
-    this.showToast('Deleted');
-  }
-
-  toggleQuestion(id: string): void {
-    this.draft.questionIds = this.draft.questionIds.includes(id)
-      ? this.draft.questionIds.filter((x) => x !== id)
-      : [...this.draft.questionIds, id];
-  }
-
-  toggleCandidate(id: string): void {
-    this.draft.candidateIds = this.draft.candidateIds.includes(id)
-      ? this.draft.candidateIds.filter((x) => x !== id)
-      : [...this.draft.candidateIds, id];
-  }
-
-  isQuestionSelected(id: string): boolean {
-    return this.draft.questionIds.includes(id);
-  }
-
-  isCandidateSelected(id: string): boolean {
-    return this.draft.candidateIds.includes(id);
-  }
-
-  getStatusClass(status: string): string {
-    return `badge badge--${status}`;
-  }
-
-  prevStep(): void {
-    if (this.step > 1) this.step--;
+  isCandidateSelected(candidateId: number): boolean {
+    return this.draft.candidateId === candidateId;
   }
 
   nextStep(): void {
-    if (this.step < 3) this.step++;
+    if (this.step === 1) {
+      if (!this.validateStepOne()) {
+        return;
+      }
+
+      this.generateQuestions();
+
+      return;
+    }
   }
 
-  trackById(_: number, item: { id: string }): string {
+  prevStep(): void {
+    if (this.step > 1) {
+      this.step--;
+    }
+  }
+
+  private validateStepOne(): boolean {
+    if (!this.draft.candidateId) {
+      this.toastr.warning('Please select candidate');
+
+      return false;
+    }
+
+    if (!this.draft.title.trim()) {
+      this.toastr.warning('Assessment title is required');
+
+      return false;
+    }
+
+    return true;
+  }
+
+  private generateQuestions(): void {
+    if (!this.draft.candidateId) {
+      return;
+    }
+
+    this.isGeneratingQuestions = true;
+
+    this.assessmentService
+      .recommendQuestions(this.draft.candidateId, this.draft.timeLimitMinutes)
+      .subscribe({
+        next: (response: any) => {
+          this.recommendedQuestions = response.result ?? [];
+
+          this.draft.questionIds = this.recommendedQuestions.map((q) => q.id);
+
+          this.step = 2;
+
+          this.isGeneratingQuestions = false;
+        },
+
+        error: () => {
+          this.isGeneratingQuestions = false;
+
+          this.toastr.error('Failed to generate questions');
+        },
+      });
+  }
+
+  createAssessment(): void {
+    if (!this.draft.candidateId || this.draft.questionIds.length === 0) {
+      this.toastr.warning('No questions selected');
+
+      return;
+    }
+
+    const payload: AssessmentRequest = {
+      candidateId: this.draft.candidateId,
+
+      title: this.draft.title,
+
+      timeLimitMinutes: this.draft.timeLimitMinutes,
+
+      questionIds: this.draft.questionIds,
+    };
+
+    this.isCreatingAssessment = true;
+
+    this.assessmentService.create(payload).subscribe({
+      next: () => {
+        this.toastr.success('Assessment created successfully');
+
+        this.isCreatingAssessment = false;
+
+        this.closeModal();
+
+        this.loadData();
+      },
+
+      error: (err: any) => {
+        this.isCreatingAssessment = false;
+
+        const errorMessage = Array.isArray(err?.error?.errorMessages)
+          ? err.error.errorMessages.join(', ')
+          : err?.error?.errorMessages || 'Failed to create assessment';
+
+        this.toastr.error(errorMessage);
+      },
+    });
+  }
+
+  changeStatus(assessment: Assessment, status: string): void {
+    if (assessment.status === status) {
+      return;
+    }
+
+    this.assessmentService.updateStatus(assessment.id, status).subscribe({
+      next: () => {
+        assessment.status = status;
+
+        this.toastr.success('Status updated successfully');
+      },
+
+      error: () => {
+        this.toastr.error('Failed to update status');
+      },
+    });
+  }
+
+  deleteAssessment(assessmentId: number): void {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!',
+    }).then((result) => {
+      if (result.isConfirmed)
+        this.assessmentService.delete(assessmentId).subscribe({
+          next: () => {
+            this.toastr.success('Assessment deleted successfully');
+
+            this.loadData();
+          },
+
+          error: () => {
+            this.toastr.error('Failed to delete assessment');
+          },
+        });
+    });
+  }
+
+  private loadAssessments(): void {
+    this.assessmentService.getAll().subscribe({
+      next: (response: any) => {
+        this.assessments = response.result ?? [];
+      },
+
+      error: () => {
+        this.toastr.error('Failed to refresh assessments');
+      },
+    });
+  }
+
+  getCandidateName(candidateId: number): string {
+    const candidate = this.candidates.find((c) => c.id === candidateId);
+
+    if (!candidate) {
+      return 'Unknown Candidate';
+    }
+
+    return `${candidate.firstName} ${candidate.lastName}`;
+  }
+
+  getQuestionCount(assessment: Assessment): number {
+    return assessment.questions?.length ?? 0;
+  }
+
+  getStatusClass(status: string): string {
+    switch (status?.toUpperCase()) {
+      case 'PENDING':
+        return 'badge pending';
+
+      case 'IN_PROGRESS':
+        return 'badge progress';
+
+      case 'COMPLETED':
+        return 'badge completed';
+
+      default:
+        return 'badge';
+    }
+  }
+
+  trackByAssessment(index: number, item: Assessment): number {
+    return item.id;
+  }
+
+  trackByCandidate(index: number, item: any): number {
+    return item.id;
+  }
+
+  trackByQuestion(index: number, item: Question): number {
     return item.id;
   }
 }

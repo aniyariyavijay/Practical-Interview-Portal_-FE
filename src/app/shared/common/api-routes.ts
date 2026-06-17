@@ -13,7 +13,8 @@ export const API_ROUTES = {
     CREATE: '/questions',
     UPDATE: '/questions/',
     DELETE: '/questions/',
-    GET_ALL_CATEGORIES: '/questions/category'
+    GET_ALL_CATEGORIES: '/questions/category',
+    RECOMMANDED_QUESTIONS: '/questions/recommend',
   },
   DASHBOARD: {
     STATS: 'dashboard/stats',
@@ -23,5 +24,13 @@ export const API_ROUTES = {
     QUESTIONS_BY_DIFF: '/dashboard/questions-by-difficulty',
     AI_SCORE_DIST: '/dashboard/ai-score-distribution',
     RECENT_ACTIVITY: '/dashboard/recent-activity',
-  }
+  },
+  ASSESSMENT: {
+    GET_ALL: '/assessments',
+    GET_BY_ID: '/assessments/',
+    CREATE: '/assessments',
+    DELETE: '/assessments/',
+    CHANGE_STATUS: '/assessments/',
+    AVAILABLE_CANDIDATES: '/assessments/available-candidates',
+  },
 };

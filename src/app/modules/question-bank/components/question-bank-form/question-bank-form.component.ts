@@ -1,6 +1,16 @@
 import { Component } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Category, Question, QuestionSolution } from '../../interfaces/question.interfase';
+import {
+  FormArray,
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import {
+  Category,
+  Question,
+  QuestionSolution,
+} from '../../interfaces/question.interfase';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -16,7 +26,8 @@ import { CustomValidators } from '../../../../shared/validators/custom-validator
 
 @Component({
   selector: 'app-question-bank-form',
-  imports: [CommonModule,
+  imports: [
+    CommonModule,
     FormsModule,
     MatButtonModule,
     MatIconModule,
@@ -24,7 +35,8 @@ import { CustomValidators } from '../../../../shared/validators/custom-validator
     MatFormFieldModule,
     MatSelectModule,
     MatPaginatorModule,
-    ReactiveFormsModule],
+    ReactiveFormsModule,
+  ],
   templateUrl: './question-bank-form.component.html',
   styleUrl: './question-bank-form.component.scss',
 })
@@ -38,7 +50,17 @@ export class QuestionBankFormComponent {
 
   availableLanguages: string[] = ['Java', 'Python', 'JavaScript', 'C++', 'Go'];
 
-  designations: string[] = ['TSE', 'ASE', 'SE', 'SSE', 'TL', 'STL', 'APM', 'PM', 'PPM'];
+  designations: string[] = [
+    'TSE',
+    'ASE',
+    'SE',
+    'SSE',
+    'TL',
+    'STL',
+    'APM',
+    'PM',
+    'PPM',
+  ];
 
   allCategories: Category[] = [];
 
@@ -49,8 +71,8 @@ export class QuestionBankFormComponent {
     private router: Router,
     private route: ActivatedRoute,
     private readonly questionService: QuestionService,
-    private readonly toastr: ToastrService
-  ) { }
+    private readonly toastr: ToastrService,
+  ) {}
 
   ngOnInit(): void {
     this.buildForm();
@@ -72,7 +94,7 @@ export class QuestionBankFormComponent {
       designations: [[], [CustomValidators.minLengthArray(1)]],
       isActive: [true],
       solutions: this.fb.array([], [CustomValidators.minLengthArray(1)]),
-      categories: [[], [CustomValidators.minLengthArray(1)]]
+      categories: [[], [CustomValidators.minLengthArray(1)]],
     });
   }
 
@@ -107,7 +129,7 @@ export class QuestionBankFormComponent {
           estimatedTime: response.result.estimatedTime,
           isActive: response.result.isActive,
           designations: response.result.designations || [],
-          categories: response.result.categories || []
+          categories: response.result.categories || [],
         });
 
         const solutionsFormArray = this.solutions;
@@ -119,8 +141,8 @@ export class QuestionBankFormComponent {
             solutionsFormArray.push(
               this.fb.group({
                 language: [sol.language, Validators.required],
-                solutionCode: [sol.solutionCode, Validators.required]
-              })
+                solutionCode: [sol.solutionCode, Validators.required],
+              }),
             );
           });
 
@@ -132,7 +154,7 @@ export class QuestionBankFormComponent {
         console.error('Error loading question:', err);
 
         this.goBack();
-      }
+      },
     });
   }
 
@@ -157,9 +179,8 @@ export class QuestionBankFormComponent {
   addSolution(): void {
     const solutionForm = this.fb.group({
       language: ['', Validators.required],
-      solutionCode: ['', Validators.required]
+      solutionCode: ['', Validators.required],
     });
-
 
     this.solutions.push(solutionForm);
     this.activeSolutionIndex = this.solutions.length - 1;
@@ -167,7 +188,10 @@ export class QuestionBankFormComponent {
 
   removeSolution(index: number): void {
     this.solutions.removeAt(index);
-    this.activeSolutionIndex = Math.max(0, Math.min(this.activeSolutionIndex, this.solutions.length - 1));
+    this.activeSolutionIndex = Math.max(
+      0,
+      Math.min(this.activeSolutionIndex, this.solutions.length - 1),
+    );
   }
 
   isInvalid(field: string): boolean {
@@ -186,7 +210,7 @@ export class QuestionBankFormComponent {
     const payload = {
       ...this.questionForm.value,
       categoryIds: this.categoriesControl.value.map((cat: Category) => cat.id),
-      designations: this.designationsControl.value
+      designations: this.designationsControl.value,
     };
     delete payload.categories;
 
@@ -208,7 +232,7 @@ export class QuestionBankFormComponent {
       error: (err) => {
         this.toastr.error('Failed to create question.');
         console.error('Create error:', err);
-      }
+      },
     });
   }
 
@@ -221,20 +245,23 @@ export class QuestionBankFormComponent {
       error: (err) => {
         this.toastr.error('Failed to update question.');
         console.error('Update error:', err);
-      }
+      },
     });
   }
 
   isLanguageDisabled(languageToCheck: string, currentIndex: number): boolean {
     const allSolutions = this.solutions.value;
 
-    return allSolutions.some((sol: any, index: number) =>
-      sol.language === languageToCheck && index !== currentIndex
+    return allSolutions.some(
+      (sol: any, index: number) =>
+        sol.language === languageToCheck && index !== currentIndex,
     );
   }
 
   triggerFileInput(index: number): void {
-    const fileInput = document.getElementById(`file-upload-${index}`) as HTMLInputElement;
+    const fileInput = document.getElementById(
+      `file-upload-${index}`,
+    ) as HTMLInputElement;
     if (fileInput) {
       fileInput.click();
     }
@@ -256,7 +283,7 @@ export class QuestionBankFormComponent {
 
         // Patch the text area with the file contents!
         solutionGroup.patchValue({
-          solutionCode: fileContent
+          solutionCode: fileContent,
         });
 
         // 🔥 BONUS: Auto-detect the language based on file extension!
@@ -271,7 +298,11 @@ export class QuestionBankFormComponent {
     }
   }
 
-  private autoDetectLanguage(filename: string, group: any, index: number): void {
+  private autoDetectLanguage(
+    filename: string,
+    group: any,
+    index: number,
+  ): void {
     const ext = filename.split('.').pop()?.toLowerCase();
     let detectedLang = '';
 
@@ -293,7 +324,7 @@ export class QuestionBankFormComponent {
 
     // 2. Patch the code value to an empty string!
     solutionGroup.patchValue({
-      solutionCode: ''
+      solutionCode: '',
     });
   }
 

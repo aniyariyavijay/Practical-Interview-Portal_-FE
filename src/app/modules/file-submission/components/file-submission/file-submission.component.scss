@@ -127,6 +127,26 @@ table {
   color: #15803d;
 }
 
+.status-pass {
+  background: #dcfce7;
+  color: #15803d;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 999px;
+}
+
+.status-fail {
+  background: #fee2e2;
+  color: #dc2626;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 999px;
+}
+
+.status-normal {
+  color: #000;
+}
+
 /* SCORE */
 .score-badge {
   display: inline-flex;

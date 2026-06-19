@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core';
 import { ActivityItem, AiScoreDistribution, AssessmentStatusBreakdown, CandidatePipeline, DashboardData, DashboardStats, QuestionsByDifficulty, RecentSubmission } from '../../interfaces/dashboard.interface';
 import { Chart, registerables } from 'chart.js';
 import { DashboardService } from '../../services/dashboard-service';
@@ -43,6 +43,7 @@ export class DashboardComponent {
   constructor(
     private readonly dashboardService: DashboardService,
     private readonly toastr: ToastrService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -71,16 +72,16 @@ export class DashboardComponent {
           this.stats = data.stats;
           this.pipeline = data.candidatePipeline;
           this.recentSubmissions = data.recentSubmissions;
-          this.questionsByDifficulty = data.questionsByDifficulty;
+          this.questionsByDifficulty = data.questionsByDifficulty;                                      
           this.recentActivity = data.recentActivity;
 
           this.deriveCounts();
 
-          setTimeout(() => {
-            this.drawStatusChart(data.assessmentStatusBreakdown);
-            this.drawDiffChart(data.questionsByDifficulty);
-            this.drawScoreChart(data.aiScoreDistribution);
-          }, 0);
+          this.cdr.detectChanges();
+
+          this.drawStatusChart(data.assessmentStatusBreakdown);
+          this.drawDiffChart(data.questionsByDifficulty);
+          this.drawScoreChart(data.aiScoreDistribution);
         },
         error: () => {
           this.isLoading = false;

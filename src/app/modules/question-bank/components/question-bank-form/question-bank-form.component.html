@@ -47,6 +47,7 @@
                     <div class="card-title">
                         <mat-icon>code</mat-icon>
                         Solutions
+                        <span class="required">*</span>
                         <button type="button" class="add-solution-btn" (click)="addSolution()">
                             <mat-icon>add</mat-icon>
                             Add Solution
@@ -184,6 +185,7 @@
                     <div class="card-title">
                         <mat-icon>label_outline</mat-icon>
                         Categories
+                        <span class="required">*</span>
                     </div>
 
                     <div class="categories-grid">
@@ -204,7 +206,7 @@
                 <!-- Actions -->
                 <div class="form-actions">
                     <button type="button" class="cancel-btn" (click)="goBack()">Cancel</button>
-                    <button type="submit" class="save-btn">
+                    <button type="submit" class="save-btn" [disabled]="questionForm.invalid || questionForm.pending">
                         <mat-icon>{{ isEditMode ? 'save' : 'add_circle_outline' }}</mat-icon>
                         {{ isEditMode ? 'Update' : 'Save' }} Question
                     </button>

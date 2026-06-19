@@ -55,7 +55,7 @@ export class UserDialogComponent {
         Validators.email,
       ],
     ],
-    password: [''],
+    password: ['',Validators.required],
     roleId: [2],
     isActive: [true],
   });

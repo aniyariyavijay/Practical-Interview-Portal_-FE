@@ -165,3 +165,22 @@
 .submit-btn:hover {
   background: #1e293b;
 }
+
+.submit-btn {
+  background: #0f172a;
+  color: #fff;
+}
+
+.submit-btn:not(:disabled):hover {
+  background: #1e293b;
+}
+
+.submit-btn:disabled {
+  background: #d1d5db;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.required {
+    color: #dc2626;
+  }

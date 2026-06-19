@@ -23,6 +23,7 @@
 
             <label>
                 First Name
+                <span class="required">*</span>
             </label>
 
             <input
@@ -38,6 +39,7 @@
 
             <label>
                 Last Name
+                <span class="required">*</span>
             </label>
 
             <input
@@ -53,6 +55,7 @@
 
             <label>
                 Email
+                <span class="required">*</span>
             </label>
 
             <input
@@ -70,6 +73,7 @@
 
                 <label>
                     Experience
+                    <span class="required">*</span>
                 </label>
 
                 <input
@@ -85,6 +89,7 @@
 
                 <label>
                     Designation
+                    <span class="required">*</span>
                 </label>
 
                 <input
@@ -132,6 +137,7 @@
         <button
             class="submit-btn"
             (click)="submit()"
+            [disabled]="form.invalid || form.pending"
         >
             {{ isEditMode ? 'Update Candidate' : 'Create Candidate' }}
         </button>

@@ -540,3 +540,18 @@
 .custom-select.error {
   border-color: #ef4444;
 }
+
+.save-btn {
+  background: #0f172a;
+  color: #fff;
+}
+
+.save-btn:not(:disabled):hover {
+  background: #1e293b;
+}
+
+.save-btn:disabled {
+  background: #d1d5db;
+  color: #94a3b8;
+  cursor: not-allowed;
+}

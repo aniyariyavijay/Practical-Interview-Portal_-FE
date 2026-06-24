@@ -6,10 +6,25 @@
             <h2>Questions</h2>
             <p>Manage interview questions</p>
         </div>
-        <button class="add-btn" (click)="openAddPage()">
-            <mat-icon>add</mat-icon>
-            Add Question
-        </button>
+        <div class="header-actions">
+
+            <button class="upload-btn" (click)="fileInput.click()">
+
+                <mat-icon>upload_file</mat-icon>
+                Bulk Upload
+
+            </button>
+
+            <input #fileInput hidden type="file" accept=".xlsx,.xls" (change)="uploadExcel($event)">
+
+            <button class="add-btn" (click)="openAddPage()">
+
+                <mat-icon>add</mat-icon>
+                Add Question
+
+            </button>
+
+        </div>
     </div>
 
     <!-- FILTERS -->

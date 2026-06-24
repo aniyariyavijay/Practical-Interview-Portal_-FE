@@ -15,6 +15,7 @@ export const API_ROUTES = {
     DELETE: '/questions/',
     GET_ALL_CATEGORIES: '/questions/category',
     RECOMMANDED_QUESTIONS: '/questions/recommend',
+    UPLOAD: '/questions/upload',
   },
   DASHBOARD: {
     STATS: 'dashboard/stats',

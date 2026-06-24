@@ -91,7 +91,7 @@ export class Login {
 
             this.authService.setToken(accessToken, refreshToken, user);
 
-            this.toastr.success('Login successful');
+            // this.toastr.success('Login successful');
 
             this.router.navigate(['/dashboard']);
           } else {

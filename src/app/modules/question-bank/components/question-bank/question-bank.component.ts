@@ -36,7 +36,7 @@ import { ApiResponse } from '../../../../shared/interfaces/api-response.interfac
 })
 export class QuestionBankComponent {
 
-  displayedColumns: string[] = ['title', 'difficulty', 'categories','designations', 'status', 'actions'];
+  displayedColumns: string[] = ['title', 'difficulty', 'categories', 'designations', 'status', 'actions'];
 
   dataSource = new MatTableDataSource<Question>([]);
 
@@ -149,7 +149,7 @@ export class QuestionBankComponent {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '420px',
       disableClose: true,
-      data: { title:"Question",name: question.title },
+      data: { title: "Question", name: question.title },
     });
 
     dialogRef.afterClosed().subscribe((confirmed) => {
@@ -165,5 +165,25 @@ export class QuestionBankComponent {
         },
       });
     });
+  }
+
+  uploadExcel(event: any): void {
+    const file = event.target.files[0];
+
+    if (!file) {
+      return;
+    }
+
+    this.questionService.uploadQuestions(file).subscribe({
+      next: () => {
+        this.toastr.success('Questions uploaded successfully');
+        this.getQuestions();
+        event.target.value = '';
+      },
+      error: () => {
+        this.toastr.error('Upload failed');
+      }
+    });
+
   }
 }

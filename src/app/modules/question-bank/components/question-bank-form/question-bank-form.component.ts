@@ -72,7 +72,7 @@ export class QuestionBankFormComponent {
     private route: ActivatedRoute,
     private readonly questionService: QuestionService,
     private readonly toastr: ToastrService,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.buildForm();
@@ -219,8 +219,6 @@ export class QuestionBankFormComponent {
     } else {
       this.createNewQuestion(payload);
     }
-
-    this.goBack();
   }
 
   private createNewQuestion(payload: any): void {

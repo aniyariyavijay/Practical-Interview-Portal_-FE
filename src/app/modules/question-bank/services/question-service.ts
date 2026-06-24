@@ -13,7 +13,7 @@ export class QuestionService {
   constructor(
     private apiInterface: APIInterfaceService) { }
 
-  getQuestions(): Observable<ApiResponse<Question[]>> {    
+  getQuestions(): Observable<ApiResponse<Question[]>> {
     return this.apiInterface.get<Question[]>(API_ROUTES.QUESTIONS.GET_ALL);
   }
 
@@ -44,6 +44,15 @@ export class QuestionService {
 
   getCategories(): Observable<ApiResponse<Category[]>> {
     return this.apiInterface.get<Category[]>(API_ROUTES.QUESTIONS.GET_ALL_CATEGORIES);
+  }
+
+  uploadQuestions(file: File) {
+
+    const formData = new FormData();
+
+    formData.append('file', file);
+
+    return this.apiInterface.post<ApiResponse<Question[]>>(API_ROUTES.QUESTIONS.UPLOAD,formData);
   }
 
 }
